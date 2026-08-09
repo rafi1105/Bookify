@@ -1,0 +1,113 @@
+/* ==========================================================================
+   BOOKIFY DESIGN SYSTEM — CSS VARIABLES & THEMES
+   ========================================================================== */
+
+:root {
+  /* --- Light Mode Palette --- */
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-panel: #ffffff;
+  --bg-input: #f1f5f9;
+  --bg-nav: rgba(255, 255, 255, 0.85);
+  --bg-pill: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  --bg-backdrop: rgba(15, 23, 42, 0.6);
+
+  --text-main: #0f172a;
+  --text-sub: #334155;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+
+  --cyan-primary: #0284c7;
+  --cyan-hover: #0369a1;
+  --cyan-light: #e0f2fe;
+  --cyan-text: #0284c7;
+
+  --indigo-primary: #4f46e5;
+  --purple-primary: #9333ea;
+  --emerald-primary: #059669;
+  --amber-primary: #d97706;
+  --rose-primary: #dc2626;
+  --pink-primary: #db2777;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* --- Apple Liquid Glass Tokens (Light Mode) --- */
+  --liquid-glass-bg: rgba(255, 255, 255, 0.78);
+  --liquid-glass-border: rgba(255, 255, 255, 0.9);
+  --liquid-glass-highlight: rgba(255, 255, 255, 0.95);
+  --liquid-glass-shadow: 0 25px 60px -12px rgba(0, 20, 50, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.75);
+  --liquid-pill-bg: rgba(255, 255, 255, 0.65);
+  --liquid-pill-border: rgba(0, 0, 0, 0.08);
+  --liquid-popover-bg: rgba(255, 255, 255, 0.92);
+  --liquid-popover-border: rgba(255, 255, 255, 0.95);
+}
+
+.dark {
+  /* --- Dark Mode Palette --- */
+  --bg-main: #050714;
+  --bg-surface: #0a0f20;
+  --bg-card: #0f172a;
+  --bg-panel: #0b1120;
+  --bg-input: #050714;
+  --bg-nav: rgba(5, 7, 20, 0.88);
+  --bg-pill: #0f172a;
+  --bg-hover: #1e293b;
+  --bg-backdrop: rgba(0, 0, 0, 0.8);
+
+  --text-main: #f8fafc;
+  --text-sub: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-inverse: #0f172a;
+
+  --border-color: #1e293b;
+  --border-hover: #334155;
+
+  --cyan-primary: #00d2ff;
+  --cyan-hover: #38bdf8;
+  --cyan-light: rgba(0, 210, 255, 0.15);
+  --cyan-text: #00d2ff;
+
+  --indigo-primary: #6366f1;
+  --purple-primary: #a855f7;
+  --emerald-primary: #10b981;
+  --amber-primary: #f59e0b;
+  --rose-primary: #ef4444;
+  --pink-primary: #ec4899;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+
+  /* --- Apple Liquid Glass Tokens (Dark Mode) --- */
+  --liquid-glass-bg: rgba(15, 23, 42, 0.68);
+  --liquid-glass-border: rgba(255, 255, 255, 0.18);
+  --liquid-glass-highlight: rgba(255, 255, 255, 0.35);
+  --liquid-glass-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(0, 210, 255, 0.25);
+  --liquid-pill-bg: rgba(255, 255, 255, 0.08);
+  --liquid-pill-border: rgba(255, 255, 255, 0.16);
+  --liquid-popover-bg: rgba(15, 23, 42, 0.94);
+  --liquid-popover-border: rgba(255, 255, 255, 0.22);
+}

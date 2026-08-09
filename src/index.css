@@ -1,0 +1,8 @@
+/* ==========================================================================
+   BOOKIFY MAIN STYLESHEET ENTRY POINT (PURE VANILLA CSS)
+   ========================================================================== */
+
+@import "./styles/variables.css";
+@import "./styles/global.css";
+@import "./styles/components.css";
+@import "./styles/pages.css";
