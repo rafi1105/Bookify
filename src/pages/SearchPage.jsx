@@ -47,17 +47,19 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+    <div className="page-container search-page container">
       
       {/* Search Header Widget */}
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold theme-text-main font-display">Bus Search Results</h1>
-            <p className="text-xs theme-text-sub">Showing available luxury coaches from <span className="text-cyan-500 font-bold">{from}</span> to <span className="text-cyan-500 font-bold">{to}</span></p>
+      <div className="search-header-container">
+        <div className="search-header-top">
+          <div className="search-header-title-block">
+            <h1 className="search-page-title">Bus Search Results</h1>
+            <p className="search-page-subtitle">
+              Showing available luxury coaches from <span className="search-highlight">{from}</span> to <span className="search-highlight">{to}</span>
+            </p>
           </div>
-          <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-500 bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/30 shadow-sm">
-            <ShieldCheck className="w-4 h-4" />
+          <div className="search-guarantee-pill">
+            <ShieldCheck size={16} />
             <span>Guaranteed Seat Availability</span>
           </div>
         </div>
@@ -66,14 +68,14 @@ export default function SearchPage() {
       </div>
 
       {/* Main Grid: Sidebar Filters + Bus Results */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="search-layout-grid">
         
-        {/* Left 3 cols: Filters Sidebar */}
-        <div className="lg:col-span-3 glass-panel p-6 rounded-3xl border dark:border-slate-800 border-slate-200 dark:bg-slate-900 bg-white shadow-md space-y-6 sticky top-28">
+        {/* Left Filters Sidebar */}
+        <aside className="search-filters-sidebar">
           
-          <div className="flex items-center justify-between pb-3 border-b dark:border-slate-800 border-slate-200">
-            <div className="flex items-center space-x-2 theme-text-main font-bold font-display text-sm">
-              <SlidersHorizontal className="w-4 h-4 text-cyan-500" />
+          <div className="filters-header">
+            <div className="filters-title-group">
+              <SlidersHorizontal size={16} className="highlight-cyan" />
               <span>Filter Results</span>
             </div>
             <button
@@ -82,19 +84,19 @@ export default function SearchPage() {
                 setMaxPrice(60);
                 setSortBy('departure');
               }}
-              className="text-[11px] text-cyan-500 hover:underline font-semibold"
+              className="filters-reset-btn"
             >
               Reset
             </button>
           </div>
 
           {/* Sort By */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold theme-text-sub uppercase tracking-wider">Sort By</label>
+          <div className="filter-group">
+            <label className="filter-label">Sort By</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-3.5 py-2.5 dark:bg-slate-950 bg-slate-50 border dark:border-slate-800 border-slate-300 rounded-xl text-xs theme-text-main focus:outline-none focus:border-cyan-500 cursor-pointer shadow-sm"
+              className="filter-select"
             >
               <option value="departure">Departure Time (Earliest)</option>
               <option value="price">Lowest Fare First</option>
@@ -103,30 +105,24 @@ export default function SearchPage() {
           </div>
 
           {/* Bus Category */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold theme-text-sub uppercase tracking-wider">Bus Class</label>
-            <div className="flex flex-col space-y-2 text-xs">
+          <div className="filter-group">
+            <label className="filter-label">Bus Class</label>
+            <div className="filter-category-buttons">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-3.5 py-2.5 rounded-xl text-left font-medium transition-colors ${
-                  selectedCategory === 'all' ? 'bg-cyan-500/20 text-cyan-500 font-bold border border-cyan-500/30' : 'theme-text-sub hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                className={`filter-btn ${selectedCategory === 'all' ? 'active' : ''}`}
               >
                 All Bus Classes
               </button>
               <button
                 onClick={() => setSelectedCategory('sleeper')}
-                className={`px-3.5 py-2.5 rounded-xl text-left font-medium transition-colors ${
-                  selectedCategory === 'sleeper' ? 'bg-purple-500/20 text-purple-600 dark:text-purple-300 font-bold border border-purple-500/30' : 'theme-text-sub hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                className={`filter-btn ${selectedCategory === 'sleeper' ? 'active' : ''}`}
               >
                 Pod-Sleeper Only
               </button>
               <button
                 onClick={() => setSelectedCategory('seater')}
-                className={`px-3.5 py-2.5 rounded-xl text-left font-medium transition-colors ${
-                  selectedCategory === 'seater' ? 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 font-bold border border-indigo-500/30' : 'theme-text-sub hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                className={`filter-btn ${selectedCategory === 'seater' ? 'active' : ''}`}
               >
                 VIP Executive Seater
               </button>
@@ -134,10 +130,10 @@ export default function SearchPage() {
           </div>
 
           {/* Max Price Slider */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs font-bold">
-              <span className="theme-text-sub uppercase tracking-wider">Max Price</span>
-              <span className="text-cyan-500">${maxPrice}</span>
+          <div className="filter-price-slider">
+            <div className="filter-price-row">
+              <span className="filter-label">Max Price</span>
+              <span className="highlight-cyan">${maxPrice}</span>
             </div>
             <input
               type="range"
@@ -146,41 +142,41 @@ export default function SearchPage() {
               step="5"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full accent-cyan-500 cursor-pointer"
+              className="filter-range-slider"
             />
           </div>
 
           {/* Amenities */}
-          <div className="space-y-2 pt-2 border-t dark:border-slate-800 border-slate-200">
-            <label className="block text-xs font-bold theme-text-sub uppercase tracking-wider">Included Amenities</label>
-            <div className="space-y-2 text-xs theme-text-sub">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" defaultChecked className="accent-cyan-500 rounded" />
+          <div className="filter-amenities-group">
+            <label className="filter-label">Included Amenities</label>
+            <div className="filter-amenities-list">
+              <label className="filter-checkbox-label">
+                <input type="checkbox" defaultChecked className="filter-checkbox" />
                 <span>Wi-Fi 6 Ultra Fast</span>
               </label>
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" defaultChecked className="accent-cyan-500 rounded" />
+              <label className="filter-checkbox-label">
+                <input type="checkbox" defaultChecked className="filter-checkbox" />
                 <span>Personal Reading Pod Light</span>
               </label>
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" defaultChecked className="accent-cyan-500 rounded" />
+              <label className="filter-checkbox-label">
+                <input type="checkbox" defaultChecked className="filter-checkbox" />
                 <span>Satellite Live GPS Feed</span>
               </label>
             </div>
           </div>
 
-        </div>
+        </aside>
 
-        {/* Right 9 cols: Buses list & Seat picker accordion */}
-        <div className="lg:col-span-9 space-y-6">
+        {/* Right Buses list & Seat picker accordion */}
+        <div className="search-results-col">
           
           <div className="search-results-info">
-            <span>Found <strong className="theme-text-main font-bold">{filteredBuses.length}</strong> matching luxury buses</span>
-            <span className="text-cyan-500 font-semibold">• All buses include AC & Live Telematics</span>
+            <span>Found <strong>{filteredBuses.length}</strong> matching luxury buses</span>
+            <span className="highlight-cyan">• All buses include AC & Live Telematics</span>
           </div>
 
           {filteredBuses.map((bus) => (
-            <div key={bus.id} className="space-y-4">
+            <div key={bus.id} className="search-bus-item">
               <BusCard
                 bus={bus}
                 isSelected={selectedBusId === bus.id}
@@ -189,7 +185,7 @@ export default function SearchPage() {
 
               {/* Inline Seat Selector Drawer */}
               {selectedBusId === bus.id && (
-                <div className="p-6 rounded-3xl glass-panel border border-cyan-500/40 dark:bg-slate-900 bg-white shadow-xl animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="search-seat-picker-drawer">
                   <SeatPicker bus={bus} onComplete={handleBookingComplete} />
                 </div>
               )}

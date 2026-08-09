@@ -1638,6 +1638,58 @@
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
+  padding-top: 7rem;
+  padding-bottom: 5rem;
+}
+
+.search-header-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.search-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.search-header-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.search-page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--text-main);
+}
+
+.search-page-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.search-highlight {
+  font-weight: 700;
+  color: var(--cyan-primary);
+}
+
+.search-guarantee-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full);
+  background-color: rgba(16, 185, 129, 0.12);
+  color: var(--emerald-primary);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .search-layout-grid {
@@ -1662,6 +1714,67 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  position: sticky;
+  top: 7rem;
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filters-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  font-family: var(--font-display);
+}
+
+.filters-reset-btn {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cyan-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.filters-reset-btn:hover {
+  text-decoration: underline;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.filter-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .filter-category-buttons {
@@ -1671,16 +1784,16 @@
 }
 
 .filter-btn {
-  padding: 0.6rem 0.85rem;
+  padding: 0.65rem 0.85rem;
   border-radius: var(--radius-md);
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-sub);
   text-align: left;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  background: transparent;
+  background-color: var(--bg-pill);
 }
 
 .filter-btn:hover {
@@ -1691,8 +1804,64 @@
 .filter-btn.active {
   background-color: var(--cyan-light);
   color: var(--cyan-primary);
-  border-color: rgba(0, 210, 255, 0.3);
-  font-weight: 700;
+  border-color: rgba(0, 210, 255, 0.4);
+  font-weight: 800;
+}
+
+.filter-price-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-range-slider {
+  width: 100%;
+  accent-color: var(--cyan-primary);
+  cursor: pointer;
+}
+
+.filter-amenities-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.filter-amenities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-checkbox {
+  accent-color: var(--cyan-primary);
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.search-results-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .search-results-info {
@@ -1703,18 +1872,21 @@
   gap: 0.75rem;
   font-size: 0.8rem;
   color: var(--text-sub);
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
 }
 
-.search-buses-list {
+.search-bus-item {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .search-seat-picker-drawer {
-  margin-top: -0.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border-radius: var(--radius-2xl);
+  background-color: var(--bg-card);
+  border: 1px solid var(--cyan-primary);
+  box-shadow: var(--shadow-xl);
   animation: slideDown 0.3s ease-out;
 }
 
