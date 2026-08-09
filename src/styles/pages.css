@@ -276,6 +276,115 @@
   font-family: var(--font-display);
 }
 
+/* --- REVIEW CARDS GRID --- */
+.reviews-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .reviews-cards-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.review-card {
+  padding: 1.75rem;
+  border-radius: var(--radius-2xl);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.review-card:hover {
+  border-color: var(--cyan-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.review-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.review-avatar-box {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--cyan-primary);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.review-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.review-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+}
+
+.review-author-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+  font-family: var(--font-display);
+}
+
+.review-author-role {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.review-stars-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.review-star-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: #fbbf24;
+  color: #f59e0b;
+}
+
+.review-quote-text {
+  font-size: 0.875rem;
+  color: var(--text-sub);
+  line-height: 1.65;
+  font-style: italic;
+  text-align: left;
+  flex-grow: 1;
+}
+
+.review-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--emerald-primary);
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
 
 /* --------------------------------------------------------------------------
    3. CONTACT PAGE
@@ -1584,6 +1693,17 @@
   color: var(--cyan-primary);
   border-color: rgba(0, 210, 255, 0.3);
   font-weight: 700;
+}
+
+.search-results-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  padding-bottom: 0.75rem;
 }
 
 .search-buses-list {

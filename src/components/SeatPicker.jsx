@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, CheckCircle2, Info, ArrowRight, ShieldCheck, MapPin, Clock, DollarSign, Settings, Bath, Check } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function SeatPicker({ bus, onComplete }) {
   const [deck, setDeck] = useState('lower');
@@ -84,14 +84,14 @@ export default function SeatPicker({ bus, onComplete }) {
   };
 
   return (
-    <div className="seat-picker-grid">
+    <div className="seat-picker-layout">
       
       {/* Left 7 cols: Bus Deck & Seat Grid */}
-      <div className="seat-picker-main-col space-y-6">
+      <div className="seat-picker-deck-col">
         <div className="seat-picker-card">
           
           <div className="seat-picker-header">
-            <div>
+            <div className="seat-picker-header-titles">
               <h4 className="seat-picker-title">Select Your Seat Layout</h4>
               <p className="seat-picker-subtitle">Click on available seats to reserve (Max 4 seats)</p>
             </div>
@@ -99,12 +99,14 @@ export default function SeatPicker({ bus, onComplete }) {
             {/* Deck Switcher */}
             <div className="seat-deck-switcher">
               <button
+                type="button"
                 onClick={() => setDeck('lower')}
-                className={`seat-deck-btn ${deck === 'lower' ? 'active' : ''}`}
+                className={`seat-deck-btn ${deck === 'lower' ? 'active-lower' : ''}`}
               >
                 Lower Deck
               </button>
               <button
+                type="button"
                 onClick={() => setDeck('upper')}
                 className={`seat-deck-btn ${deck === 'upper' ? 'active-upper' : ''}`}
               >
@@ -142,7 +144,7 @@ export default function SeatPicker({ bus, onComplete }) {
                 <span className="seat-picker-subtitle">Driver Cabin</span>
               </div>
               <div className="seat-interior-driver-icon">
-                <Settings className="w-4 h-4 text-cyan-500" />
+                ⚙️
               </div>
             </div>
 
@@ -172,7 +174,7 @@ export default function SeatPicker({ bus, onComplete }) {
 
                     {isSelected && (
                       <span className="seat-interior-btn-check">
-                        <Check className="w-3 h-3 text-cyan-400" />
+                        ✓
                       </span>
                     )}
                   </button>
@@ -180,12 +182,9 @@ export default function SeatPicker({ bus, onComplete }) {
               })}
             </div>
 
-            <div className="seat-interior-footer-bar flex items-center justify-between text-xs">
+            <div className="seat-interior-footer-bar">
               <span>Back Door & Emergency Exit</span>
-              <span className="flex items-center space-x-1">
-                <Bath className="w-3.5 h-3.5 text-cyan-500" />
-                <span>Onboard Restroom</span>
-              </span>
+              <span>Onboard Restroom 🚽</span>
             </div>
 
           </div>
@@ -210,10 +209,11 @@ export default function SeatPicker({ bus, onComplete }) {
                 required
                 value={passenger.fullName}
                 onChange={(e) => setPassenger({ ...passenger, fullName: e.target.value })}
+                className="seat-form-input"
               />
             </div>
 
-            <div className="seat-form-grid-2">
+            <div className="seat-form-row">
               <div className="seat-form-group">
                 <label className="seat-form-label">Email Address</label>
                 <input
@@ -221,6 +221,7 @@ export default function SeatPicker({ bus, onComplete }) {
                   required
                   value={passenger.email}
                   onChange={(e) => setPassenger({ ...passenger, email: e.target.value })}
+                  className="seat-form-input"
                 />
               </div>
               <div className="seat-form-group">
@@ -230,67 +231,68 @@ export default function SeatPicker({ bus, onComplete }) {
                   required
                   value={passenger.phone}
                   onChange={(e) => setPassenger({ ...passenger, phone: e.target.value })}
+                  className="seat-form-input"
                 />
               </div>
             </div>
 
-            <div className="seat-form-fields pt-2">
-              <div className="seat-form-group">
-                <label className="search-label">Boarding Point</label>
-                <select
-                  value={boardingPoint}
-                  onChange={(e) => setBoardingPoint(e.target.value)}
-                >
-                  {bus.boardingPoints.map((bp, i) => (
-                    <option key={i} value={bp}>{bp}</option>
-                  ))}
-                </select>
-              </div>
+            <div className="seat-form-group">
+              <label className="seat-form-label">Boarding Point</label>
+              <select
+                value={boardingPoint}
+                onChange={(e) => setBoardingPoint(e.target.value)}
+                className="seat-form-select"
+              >
+                {bus.boardingPoints.map((bp, i) => (
+                  <option key={i} value={bp}>{bp}</option>
+                ))}
+              </select>
+            </div>
 
-              <div className="seat-form-group">
-                <label className="search-label">Dropping Point</label>
-                <select
-                  value={droppingPoint}
-                  onChange={(e) => setDroppingPoint(e.target.value)}
-                >
-                  {bus.droppingPoints.map((dp, i) => (
-                    <option key={i} value={dp}>{dp}</option>
-                  ))}
-                </select>
-              </div>
+            <div className="seat-form-group">
+              <label className="seat-form-label">Dropping Point</label>
+              <select
+                value={droppingPoint}
+                onChange={(e) => setDroppingPoint(e.target.value)}
+                className="seat-form-select"
+              >
+                {bus.droppingPoints.map((dp, i) => (
+                  <option key={i} value={dp}>{dp}</option>
+                ))}
+              </select>
             </div>
 
           </div>
 
-          <div className="seat-price-summary-box space-y-2">
-            <div className="flex justify-between text-xs theme-text-sub">
+          <div className="seat-price-summary-box">
+            <div className="seat-summary-row">
               <span>Selected Seat(s):</span>
-              <span className="font-bold text-cyan-500">{selectedSeats.join(', ')}</span>
+              <span className="highlight-cyan font-bold">{selectedSeats.join(', ')}</span>
             </div>
-            <div className="flex justify-between text-xs theme-text-sub">
+            <div className="seat-summary-row">
               <span>Base Ticket Price:</span>
               <span>${bus.price.toFixed(2)} x {selectedSeats.length}</span>
             </div>
-            <div className="flex justify-between text-xs theme-text-sub">
+            <div className="seat-summary-row">
               <span>Service Fee & GPS Tax:</span>
               <span>$2.50</span>
             </div>
-            <div className="pt-2 border-t theme-border flex justify-between items-center text-sm font-bold theme-text-main">
+            <div className="seat-summary-total-row">
               <span>Total Payable Amount:</span>
-              <span className="text-lg font-extrabold text-cyan-500 font-display">${(calculateTotal() + 2.5).toFixed(2)}</span>
+              <span className="seat-summary-total-price">${(calculateTotal() + 2.5).toFixed(2)}</span>
             </div>
           </div>
 
           <button
             type="submit"
-            className="btn-search-cta py-4"
+            className="btn-seat-checkout"
           >
             <span>Proceed to Express Checkout</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight size={16} />
           </button>
 
-          <p className="text-[11px] text-center theme-text-muted flex items-center justify-center space-x-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+          <p className="seat-guarantee-note">
+            <ShieldCheck size={14} className="text-emerald-500" />
             <span>Guaranteed 100% Instant Refund on 24h Cancellation</span>
           </p>
 

@@ -2,14 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ShieldCheck, Star, ArrowRight, Smartphone, Navigation, Clock, MapPin } from 'lucide-react';
+import { ShieldCheck, Star, ArrowRight, Smartphone, Navigation, CheckCircle2 } from 'lucide-react';
 
 import SearchWidget from '../components/SearchWidget';
 import OperatorSaaSPreview from '../components/OperatorSaaSPreview';
 import { POPULAR_ROUTES, TESTIMONIALS } from '../data/mockData';
 
 // Assets
-import heroShowcaseImg from '../assets/images/hero-showcase.jpg';
+import heroFullBannerImg from '../assets/images/hero-full-banner.jpg';
 import passengerExpImg from '../assets/images/passenger-exp.jpg';
 import scenicRouteImg from '../assets/images/scenic-route.jpg';
 import cityMetropolisImg from '../assets/images/city-metropolis.jpg';
@@ -56,8 +56,8 @@ export default function Home() {
         {/* Full Screen High-Res Photograph Background */}
         <div className="hero-bg-media">
           <img
-            src={heroShowcaseImg}
-            alt="Bookify Luxury Bus Terminal"
+            src={heroFullBannerImg}
+            alt="Bookify Luxury Bus Terminal Banner"
           />
           <div className="hero-overlay-mask"></div>
         </div>
@@ -85,12 +85,12 @@ export default function Home() {
           </div>
 
           {/* Redesigned Search Widget */}
-          <div className="hero-fade max-w-5xl mx-auto w-full">
+          <div className="hero-fade">
             <SearchWidget />
           </div>
 
           {/* Quick Feature Badges */}
-          <div className="hero-fade flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-200">
+          <div className="hero-fade">
             <div className="badge-tag">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>Zero Cancellation Fee Guarantee</span>
@@ -131,7 +131,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. POPULAR ROUTES & DEALS (PURE LUCIDE ICONS) */}
+      {/* 3. POPULAR ROUTES & DEALS (3-COLUMN GRID) */}
       <section className="container space-y-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -175,11 +175,9 @@ export default function Home() {
                 <h4 className="full-card-title">{route.from} ➔ {route.to}</h4>
 
                 <div className="full-card-meta">
-                  <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>{route.duration}</span>
+                  <span>⏱ {route.duration}</span>
                   <span>•</span>
-                  <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>{route.distance}</span>
+                  <span>📍 {route.distance}</span>
                 </div>
 
                 <div className="full-card-tags-row">
@@ -212,30 +210,40 @@ export default function Home() {
         <OperatorSaaSPreview />
       </section>
 
-      {/* 5. PASSENGER TESTIMONIALS */}
+      {/* 5. PASSENGER TESTIMONIALS (REDESIGNED REVIEWS GRID) */}
       <section className="container space-y-8">
         <div className="text-center space-y-2">
           <span className="text-xs font-bold text-cyan-500 uppercase tracking-widest">Verified Traveler Reviews</span>
           <h2 className="text-3xl font-extrabold theme-text-main font-display">Loved By Over 12 Million Passengers</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="reviews-cards-grid">
           {TESTIMONIALS.map((t, idx) => (
-            <div key={idx} className="glass-card p-6 space-y-4">
-              <div className="flex items-center space-x-1 text-amber-500">
-                {[...Array(t.rating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-amber-500" />
-                ))}
-              </div>
-              <p className="theme-text-sub text-xs sm:text-sm leading-relaxed italic">"{t.text}"</p>
-              
-              <div className="flex items-center space-x-3 pt-2 border-t theme-border">
-                <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover border border-cyan-500" />
-                <div>
-                  <h5 className="text-xs font-bold theme-text-main">{t.name}</h5>
-                  <span className="text-[10px] theme-text-muted block">{t.role}</span>
+            <div key={idx} className="review-card">
+              <div className="review-card-header">
+                <div className="review-avatar-box">
+                  <img src={t.avatar} alt={t.name} className="review-avatar-img" />
+                </div>
+                <div className="review-author-info">
+                  <h5 className="review-author-name">{t.name}</h5>
+                  <span className="review-author-role">{t.role}</span>
                 </div>
               </div>
+
+              <div className="review-stars-row">
+                {[...Array(t.rating)].map((_, i) => (
+                  <Star key={i} className="review-star-icon" />
+                ))}
+              </div>
+
+              <p className="review-quote-text">"{t.text}"</p>
+
+              {t.verified && (
+                <div className="review-verified-badge">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Verified Passenger</span>
+                </div>
+              )}
             </div>
           ))}
         </div>
