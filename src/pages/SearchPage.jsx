@@ -49,11 +49,10 @@ export default function SearchPage() {
   return (
     <div className="page-container search-page container">
       
-      {/* Sleek Hero Header Block with Embedded Search Widget */}
+      {/* Search Header Widget */}
       <div className="search-header-container">
         <div className="search-header-top">
           <div className="search-header-title-block">
-            <span className="page-badge">VERIFIED LUXURY EXPRESS</span>
             <h1 className="search-page-title">Bus Search Results</h1>
             <p className="search-page-subtitle">
               Showing available luxury coaches from <span className="search-highlight">{from}</span> to <span className="search-highlight">{to}</span>

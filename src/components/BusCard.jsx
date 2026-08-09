@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wifi, Zap, Star, ArrowRight, ShieldCheck, Navigation, Wind } from 'lucide-react';
+import { Wifi, Zap, Star, ArrowRight } from 'lucide-react';
 
 export default function BusCard({ bus, onSelectSeats, isSelected = false }) {
   return (
@@ -13,7 +13,7 @@ export default function BusCard({ bus, onSelectSeats, isSelected = false }) {
               {bus.operator}
             </span>
             <div className="bus-rating-block">
-              <Star size={14} className="fill-amber-400 text-amber-500" />
+              <Star size={14} className="fill-amber-500 text-amber-500" />
               <span>{bus.rating}</span>
               <span className="bus-rating-reviews">({bus.reviewsCount} reviews)</span>
             </div>
@@ -28,8 +28,6 @@ export default function BusCard({ bus, onSelectSeats, isSelected = false }) {
               <span key={i} className="bus-amenity-pill">
                 {amenity === 'Wi-Fi' && <Wifi size={12} className="highlight-cyan" />}
                 {amenity === 'Power Outlet' && <Zap size={12} className="text-amber-500" />}
-                {amenity === 'Air Conditioning' && <Wind size={12} className="text-sky-400" />}
-                {amenity === 'Live GPS' && <Navigation size={12} className="text-emerald-400" />}
                 <span>{amenity}</span>
               </span>
             ))}
@@ -64,16 +62,16 @@ export default function BusCard({ bus, onSelectSeats, isSelected = false }) {
         {/* Pricing & CTA */}
         <div className="bus-pricing-col">
           <div className="bus-price-block">
-            <span className="bus-price-label">STARTING FROM</span>
+            <span className="bus-price-label">Starting From</span>
             <span className="bus-price-value">${bus.price.toFixed(2)}</span>
-            <span className="bus-seats-left">🔥 {bus.availableSeats} seats left</span>
+            <span className="bus-seats-left">{bus.availableSeats} seats left</span>
           </div>
 
           <button
             onClick={() => onSelectSeats(bus)}
             className={`bus-select-seats-btn ${isSelected ? 'active' : ''}`}
           >
-            <span>{isSelected ? 'Close Seat Map' : 'Select Seat Layout'}</span>
+            <span>{isSelected ? 'Close Seat Picker' : 'Select Seat Layout'}</span>
             <ArrowRight size={16} />
           </button>
         </div>

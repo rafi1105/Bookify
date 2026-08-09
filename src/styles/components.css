@@ -2161,298 +2161,13 @@
 /* --------------------------------------------------------------------------
    5. BUS CARD
    -------------------------------------------------------------------------- */
-/* --------------------------------------------------------------------------
-   5. BUS CARD (WORLD-CLASS HIGH-END TRANSIT CARD)
-   -------------------------------------------------------------------------- */
 .bus-card-container {
-  padding: 1.75rem;
-  border-radius: var(--radius-2xl);
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-lg);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-
-.bus-card-container:hover {
-  border-color: var(--cyan-primary);
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-2xl);
-}
-
-.bus-card-container.selected {
-  border-color: var(--cyan-primary);
-  box-shadow: 0 0 25px rgba(2, 132, 199, 0.25);
-  background-color: var(--bg-card);
-}
-
-.bus-card-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-  align-items: stretch;
-}
-
-@media (min-width: 1024px) {
-  .bus-card-layout {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.bus-card-operator-col {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  flex: 1.2;
-}
-
-.bus-card-operator-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.bus-operator-tag {
-  padding: 0.3rem 0.85rem;
-  border-radius: var(--radius-full);
-  background-color: var(--cyan-light);
-  color: var(--cyan-primary);
-  border: 1px solid rgba(2, 132, 199, 0.3);
-  font-size: 0.75rem;
-  font-weight: 800;
-  font-family: var(--font-display);
-}
-
-.bus-rating-block {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: #fbbf24;
-  font-size: 0.8rem;
-  font-weight: 800;
-}
-
-.bus-rating-reviews {
-  color: var(--text-muted);
-  font-weight: 500;
-  font-size: 0.75rem;
-}
-
-.bus-card-name {
-  font-size: 1.25rem;
-  font-weight: 900;
-  color: var(--text-main);
-  font-family: var(--font-display);
-  line-height: 1.2;
-}
-
-.bus-card-type {
-  font-size: 0.8rem;
-  color: var(--text-sub);
-  font-weight: 600;
-}
-
-.bus-amenities-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  padding-top: 0.35rem;
-}
-
-.bus-amenity-pill {
-  padding: 0.3rem 0.75rem;
-  border-radius: var(--radius-full);
-  background-color: var(--bg-pill);
-  border: 1px solid var(--border-color);
-  font-size: 0.72rem;
-  color: var(--text-sub);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.bus-schedule-col {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-align: center;
-  padding: 1rem 0;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  width: 100%;
-  flex: 1.5;
-}
-
-@media (min-width: 1024px) {
-  .bus-schedule-col {
-    width: auto;
-    border-top: none;
-    border-bottom: none;
-    padding: 0 1.5rem;
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-    gap: 1.75rem;
-  }
-}
-
-.bus-schedule-node {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.bus-schedule-node.dest {
-  text-align: right;
-}
-
-.bus-schedule-time {
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: var(--text-main);
-  font-family: var(--font-display);
-  letter-spacing: -0.02em;
-  display: block;
-}
-
-.bus-schedule-city {
-  font-size: 0.8rem;
-  color: var(--text-sub);
-  font-weight: 700;
-}
-
-.bus-transit-route {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 0.75rem;
-}
-
-.bus-duration-label {
-  font-size: 0.72rem;
-  color: var(--cyan-primary);
-  font-weight: 800;
-  margin-bottom: 0.35rem;
-}
-
-.bus-transit-track {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  position: relative;
-}
-
-.bus-transit-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: var(--cyan-primary);
-  box-shadow: 0 0 8px var(--cyan-primary);
-}
-
-.bus-transit-line {
-  width: 4.5rem;
-  height: 2px;
-  background: linear-gradient(90deg, var(--cyan-primary) 0%, #00d2ff 100%);
-  border-radius: 1px;
-}
-
-.bus-nonstop-label {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  font-weight: 700;
-  margin-top: 0.35rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.bus-pricing-col {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem;
-  width: 100%;
-  flex: 1;
-}
-
-@media (min-width: 1024px) {
-  .bus-pricing-col {
-    flex-direction: column;
-    align-items: flex-end;
-    width: auto;
-  }
-}
-
-.bus-price-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-@media (min-width: 1024px) {
-  .bus-price-block {
-    align-items: flex-end;
-  }
-}
-
-.bus-price-label {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.bus-price-value {
-  font-size: 1.75rem;
-  font-weight: 900;
-  color: var(--cyan-primary);
-  font-family: var(--font-display);
-  line-height: 1.1;
-}
-
-.bus-seats-left {
-  font-size: 0.72rem;
-  color: var(--amber-primary);
-  font-weight: 700;
-  margin-top: 0.2rem;
-}
-
-.bus-select-seats-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.35rem;
+  padding: 1.5rem;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-  color: #ffffff;
-  font-size: 0.82rem;
-  font-weight: 800;
-  font-family: var(--font-display);
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-}
-
-.bus-select-seats-btn:hover {
-  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
-}
-
-.bus-select-seats-btn.active {
-  background: var(--bg-pill);
-  color: var(--text-main);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  box-shadow: none;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
 }
 
 .bus-card-container:hover {
@@ -3201,10 +2916,11 @@
 .seat-picker-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
+  align-items: flex-start;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .seat-picker-layout {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
@@ -3217,18 +2933,18 @@
   gap: 1.5rem;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .seat-picker-deck-col {
     grid-column: span 7;
   }
 }
 
 .seat-picker-card {
-  padding: 1.5rem;
-  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  border-radius: var(--radius-2xl);
   border: 1px solid var(--border-color);
   background-color: var(--bg-card);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -3475,18 +3191,18 @@
   gap: 1.5rem;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .seat-passenger-col {
     grid-column: span 5;
   }
 }
 
 .seat-checkout-card {
-  padding: 1.5rem;
-  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  border-radius: var(--radius-2xl);
   border: 1px solid var(--border-color);
   background-color: var(--bg-card);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
