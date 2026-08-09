@@ -37,77 +37,66 @@ export default function RoutesPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search city (e.g. New York, Miami, Boston...)"
-            className="w-full pl-11 pr-4 py-3 rounded-2xl text-xs theme-text-main focus:outline-none focus:border-cyan-500 shadow-sm"
+            className="w-full pl-11 pr-4 py-3 dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-300 rounded-2xl text-xs theme-text-main focus:outline-none focus:border-cyan-500 shadow-sm"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredRoutes.map((route) => {
-          const cardImg = route.imageName === 'scenic-route.jpg' ? scenicRouteImg : route.imageName === 'city-metropolis.jpg' ? cityMetropolisImg : passengerExpImg;
-          
-          return (
-            <div key={route.id} className="route-cover-card group">
-              
-              {/* Full Bleed Background Image */}
-              <div className="route-cover-bg">
-                <img
-                  src={cardImg}
-                  alt={route.from + ' to ' + route.to}
-                />
-              </div>
-              <div className="route-cover-gradient"></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredRoutes.map((route) => (
+          <div key={route.id} className="full-image-route-card group">
+            {/* Full Background Image */}
+            <img
+              src={route.imageName === 'scenic-route.jpg' ? scenicRouteImg : route.imageName === 'city-metropolis.jpg' ? cityMetropolisImg : passengerExpImg}
+              alt={route.from + ' to ' + route.to}
+              className="full-card-bg-img"
+            />
 
-              {/* Top Badges */}
-              <div className="route-cover-top">
-                <span className="px-3 py-1 rounded-full bg-slate-950/80 text-cyan-400 border border-cyan-500/30 text-xs font-bold backdrop-blur-md shadow-md">
-                  ⚡ {route.tripsPerDay} Trips Daily
-                </span>
-                <div className="flex items-center space-x-1 px-3 py-1 rounded-full bg-slate-950/80 text-amber-400 border border-amber-500/30 text-xs font-bold backdrop-blur-md shadow-md">
-                  <Star className="w-3.5 h-3.5 fill-amber-400" />
-                  <span>{route.rating}</span>
-                </div>
-              </div>
+            {/* Dark Overlay Gradient */}
+            <div className="full-card-gradient-overlay"></div>
 
-              {/* Bottom Glassmorphic Content Block */}
-              <div className="route-cover-bottom">
-                
-                <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-black text-white font-display tracking-tight">
-                    {route.from} ➔ {route.to}
-                  </h4>
-                  <span className="route-price-tag">
-                    ${route.price.toFixed(2)}
-                  </span>
-                </div>
-
-                <div className="flex items-center space-x-3 text-xs text-slate-300">
-                  <span>⏱ {route.duration}</span>
-                  <span>•</span>
-                  <span>📍 {route.distance}</span>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {route.tags.slice(0, 3).map((tag, i) => (
-                    <span key={i} className="px-2 py-0.5 rounded-md bg-slate-900/80 text-slate-200 border border-slate-700/60 text-[10px] font-medium backdrop-blur-sm">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <Link
-                  to={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
-                  className="btn-search-cta mt-2"
-                >
-                  <span>Check Bus Schedule</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-
-              </div>
-
+            {/* Top Badges */}
+            <div className="full-card-top-badges">
+              <span className="full-card-top-badge">
+                {route.tripsPerDay} Trips Daily
+              </span>
+              <span className="full-card-price-badge">
+                ${route.price.toFixed(2)}
+              </span>
             </div>
-          );
-        })}
+
+            {/* Card Content at Bottom */}
+            <div className="full-card-bottom-content">
+              <h4 className="full-card-title">{route.from} ➔ {route.to}</h4>
+
+              <div className="full-card-meta">
+                <span>⏱ {route.duration}</span>
+                <span>•</span>
+                <span>📍 {route.distance}</span>
+              </div>
+
+              <div className="full-card-tags-row">
+                <span className="full-card-rating-tag">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <span>{route.rating}</span>
+                </span>
+                {route.tags.slice(0, 2).map((tag, i) => (
+                  <span key={i} className="full-card-pill-tag">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <Link
+                to={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
+                className="full-card-cta-btn"
+              >
+                <span>Check Bus Schedule</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        ))}
       </div>
 
     </div>
