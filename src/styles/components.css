@@ -55,12 +55,15 @@
 
 /* Light Theme Navbar */
 :root:not(.dark) .floating-glass-capsule {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.65) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.45) 100%) !important;
+  background-color: rgba(255, 255, 255, 0.48) !important;
+  backdrop-filter: blur(36px) saturate(210%) contrast(105%) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(210%) contrast(105%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
   box-shadow: 
     0 20px 40px -10px rgba(0, 20, 50, 0.12),
-    0 0 0 1px rgba(0, 0, 0, 0.04),
-    inset 0 1.5px 2px 0 #ffffff;
+    0 0 20px rgba(255, 255, 255, 0.5),
+    inset 0 1.5px 2px 0 #ffffff !important;
 }
 
 .nav-brand-section {
@@ -466,21 +469,21 @@
   border-radius: var(--radius-full, 9999px) !important;
   overflow: hidden !important;
 
-  /* Translucent milky-white liquid frosted glass surface */
-  border: 1.25px solid rgba(255, 255, 255, 0.88) !important;
+  /* Translucent Liquid Frosted Glass in Light Mode — Apple "Get Now" style */
+  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.88) 0%,
-    rgba(246, 248, 252, 0.68) 38%,
-    rgba(228, 233, 242, 0.58) 70%,
-    rgba(244, 247, 253, 0.82) 100%
+    rgba(246, 248, 255, 0.48) 40%,
+    rgba(228, 236, 250, 0.38) 75%,
+    rgba(252, 254, 255, 0.82) 100%
   ) !important;
-  background-color: rgba(255, 255, 255, 0.65) !important;
-  backdrop-filter: blur(28px) saturate(190%) contrast(102%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(190%) contrast(102%) !important;
+  background-color: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(32px) saturate(210%) contrast(108%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(210%) contrast(108%) !important;
 
-  /* Deep charcoal text with internal glass reflection */
-  color: #18191f !important;
+  /* Deep charcoal text with glass depth */
+  color: #0f172a !important;
   font-family: var(--font-display, var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)) !important;
   font-size: 0.95rem !important;
   font-weight: 700 !important;
@@ -493,18 +496,18 @@
   /* 3D Liquid Glass optical physics: Ambient drop shadow + Rim reflections */
   box-shadow:
     /* Deep ambient floor shadow */
-    0 20px 45px -8px rgba(0, 0, 0, 0.16),
-    0 8px 18px -4px rgba(0, 0, 0, 0.07),
-    0 2px 5px rgba(0, 0, 0, 0.03),
+    0 20px 45px -8px rgba(15, 23, 42, 0.22),
+    0 8px 18px -4px rgba(15, 23, 42, 0.12),
+    0 2px 6px rgba(15, 23, 42, 0.05),
     /* Top specular rim — crisp bright light on glass apex */
-    inset 0 1.75px 2px 0 rgba(255, 255, 255, 1),
+    inset 0 2px 3px 0 #ffffff,
     /* Bottom specular reflection arc */
-    inset 0 -1.5px 2.5px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 3.5px 0 rgba(255, 255, 255, 0.95),
     /* Internal diffuse liquid volume refraction */
-    inset 0 0 18px 1px rgba(255, 255, 255, 0.5) !important;
+    inset 0 0 20px 2px rgba(255, 255, 255, 0.7) !important;
 
   /* Subtle downward mirror-reflection shadow under text (like "Get Now" reference) */
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.14), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  text-shadow: 0 4px 8px rgba(15, 23, 42, 0.18), 0 1px 2px rgba(15, 23, 42, 0.08) !important;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   user-select: none !important;
 }
@@ -517,9 +520,9 @@
   border-radius: inherit !important;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.18) 35%,
-    rgba(255, 255, 255, 0.0) 65%,
+    rgba(255, 255, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.2) 35%,
+    transparent 65%,
     rgba(255, 255, 255, 0.25) 100%
   ) !important;
   pointer-events: none !important;
@@ -883,12 +886,16 @@
 }
 
 :root:not(.dark) .search-widget-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(240, 245, 255, 0.22) 100%) !important;
+  background-color: rgba(255, 255, 255, 0.32) !important;
+  backdrop-filter: blur(40px) saturate(220%) contrast(108%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(220%) contrast(108%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.82) !important;
   box-shadow: 
-    0 25px 60px -12px rgba(0, 20, 50, 0.15),
-    0 0 0 1px rgba(0, 0, 0, 0.04),
-    inset 0 1.5px 2px 0 rgba(255, 255, 255, 1);
+    0 30px 70px -15px rgba(15, 23, 42, 0.16),
+    0 0 30px rgba(255, 255, 255, 0.7),
+    inset 0 2px 3px 0 #ffffff,
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.04) !important;
 }
 
 .search-widget-card.compact {
@@ -980,8 +987,10 @@
 }
 
 :root:not(.dark) .search-class-pills {
-  background-color: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.08);
+  background-color: rgba(255, 255, 255, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 
 .search-class-pill-btn {
@@ -1097,9 +1106,13 @@
 }
 
 :root:not(.dark) .btn-swap-locations {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #0284c7;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.45) 100%) !important;
+  background-color: rgba(255, 255, 255, 0.55) !important;
+  border: 1.25px solid rgba(255, 255, 255, 0.95) !important;
+  color: #0284c7 !important;
+  backdrop-filter: blur(20px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08), inset 0 1.5px 2px #ffffff !important;
 }
 
 .btn-swap-locations:hover {
@@ -1183,9 +1196,15 @@
 }
 
 :root:not(.dark) .custom-select-trigger {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), 0 4px 12px rgba(0, 0, 0, 0.04);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.38) 100%) !important;
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  border: 1.25px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 
+    0 8px 20px -4px rgba(15, 23, 42, 0.08),
+    inset 0 1.5px 2px 0 #ffffff,
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04) !important;
 }
 
 .custom-select-trigger:hover {
@@ -1196,8 +1215,9 @@
 }
 
 :root:not(.dark) .custom-select-trigger:hover {
-  border-color: rgba(0, 0, 0, 0.15);
-  background-color: rgba(255, 255, 255, 0.8);
+  border-color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.12), inset 0 2px 2px #ffffff !important;
 }
 
 .custom-select-trigger.active {
@@ -1619,9 +1639,15 @@
 }
 
 :root:not(.dark) .custom-datepicker-trigger {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), 0 4px 12px rgba(0, 0, 0, 0.04);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.38) 100%) !important;
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  border: 1.25px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 
+    0 8px 20px -4px rgba(15, 23, 42, 0.08),
+    inset 0 1.5px 2px 0 #ffffff,
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04) !important;
 }
 
 .custom-datepicker-trigger:hover {
@@ -1632,8 +1658,9 @@
 }
 
 :root:not(.dark) .custom-datepicker-trigger:hover {
-  border-color: rgba(0, 0, 0, 0.15);
-  background-color: rgba(255, 255, 255, 0.8);
+  border-color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.12), inset 0 2px 2px #ffffff !important;
 }
 
 .custom-datepicker-trigger.active {
@@ -2134,13 +2161,298 @@
 /* --------------------------------------------------------------------------
    5. BUS CARD
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   5. BUS CARD (WORLD-CLASS HIGH-END TRANSIT CARD)
+   -------------------------------------------------------------------------- */
 .bus-card-container {
-  padding: 1.5rem;
-  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  border-radius: var(--radius-2xl);
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.bus-card-container:hover {
+  border-color: var(--cyan-primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-2xl);
+}
+
+.bus-card-container.selected {
+  border-color: var(--cyan-primary);
+  box-shadow: 0 0 25px rgba(2, 132, 199, 0.25);
+  background-color: var(--bg-card);
+}
+
+.bus-card-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+  .bus-card-layout {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.bus-card-operator-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1.2;
+}
+
+.bus-card-operator-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bus-operator-tag {
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  background-color: var(--cyan-light);
+  color: var(--cyan-primary);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+}
+
+.bus-rating-block {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #fbbf24;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.bus-rating-reviews {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.bus-card-name {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--text-main);
+  font-family: var(--font-display);
+  line-height: 1.2;
+}
+
+.bus-card-type {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+.bus-amenities-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.35rem;
+}
+
+.bus-amenity-pill {
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-pill);
+  border: 1px solid var(--border-color);
+  font-size: 0.72rem;
+  color: var(--text-sub);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.bus-schedule-col {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+  flex: 1.5;
+}
+
+@media (min-width: 1024px) {
+  .bus-schedule-col {
+    width: auto;
+    border-top: none;
+    border-bottom: none;
+    padding: 0 1.5rem;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    gap: 1.75rem;
+  }
+}
+
+.bus-schedule-node {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.bus-schedule-node.dest {
+  text-align: right;
+}
+
+.bus-schedule-time {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--text-main);
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  display: block;
+}
+
+.bus-schedule-city {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  font-weight: 700;
+}
+
+.bus-transit-route {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0.75rem;
+}
+
+.bus-duration-label {
+  font-size: 0.72rem;
+  color: var(--cyan-primary);
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+}
+
+.bus-transit-track {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.bus-transit-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--cyan-primary);
+  box-shadow: 0 0 8px var(--cyan-primary);
+}
+
+.bus-transit-line {
+  width: 4.5rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan-primary) 0%, #00d2ff 100%);
+  border-radius: 1px;
+}
+
+.bus-nonstop-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-top: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bus-pricing-col {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  width: 100%;
+  flex: 1;
+}
+
+@media (min-width: 1024px) {
+  .bus-pricing-col {
+    flex-direction: column;
+    align-items: flex-end;
+    width: auto;
+  }
+}
+
+.bus-price-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .bus-price-block {
+    align-items: flex-end;
+  }
+}
+
+.bus-price-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.bus-price-value {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--cyan-primary);
+  font-family: var(--font-display);
+  line-height: 1.1;
+}
+
+.bus-seats-left {
+  font-size: 0.72rem;
+  color: var(--amber-primary);
+  font-weight: 700;
+  margin-top: 0.2rem;
+}
+
+.bus-select-seats-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.35rem;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.bus-select-seats-btn:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+}
+
+.bus-select-seats-btn.active {
+  background: var(--bg-pill);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
 }
 
 .bus-card-container:hover {
