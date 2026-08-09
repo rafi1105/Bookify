@@ -42,7 +42,7 @@ export default function RoutesPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="routes-cards-grid">
         {filteredRoutes.map((route) => (
           <div key={route.id} className="full-image-route-card group">
             {/* Full Background Image */}

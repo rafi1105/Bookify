@@ -131,7 +131,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. POPULAR ROUTES & DEALS (FULL CARD IMAGE DESIGN MATCHING IMAGE 2) */}
+      {/* 3. POPULAR ROUTES & DEALS (3-COLUMN GRID) */}
       <section className="container space-y-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -147,7 +147,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="routes-cards-grid">
           {POPULAR_ROUTES.slice(0, 6).map((route) => (
             <div key={route.id} className="full-image-route-card group">
               {/* Full Background Image */}
