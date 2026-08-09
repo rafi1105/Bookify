@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, ShieldCheck } from 'lucide-react';
+import { SlidersHorizontal, ShieldCheck, Bus, X } from 'lucide-react';
 
 import SearchWidget from '../components/SearchWidget';
 import BusCard from '../components/BusCard';
@@ -20,6 +20,9 @@ export default function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [maxPrice, setMaxPrice] = useState(60);
   const [sortBy, setSortBy] = useState('departure');
+
+  // Selected Bus Object
+  const selectedBus = MOCK_BUSES.find((b) => b.id === selectedBusId);
 
   // Filter Buses
   const filteredBuses = MOCK_BUSES.filter((bus) => {
@@ -67,10 +70,10 @@ export default function SearchPage() {
         <SearchWidget compact={true} initialFrom={from} initialTo={to} />
       </div>
 
-      {/* Main Grid: Sidebar Filters + Bus Results */}
+      {/* Main 3-Column Desktop Grid: Left Filters | Center Bus Cards | Right Seat Picker & Checkout */}
       <div className="search-layout-grid">
         
-        {/* Left Filters Sidebar */}
+        {/* Column 1: Left Filters Sidebar */}
         <aside className="search-filters-sidebar">
           
           <div className="filters-header">
@@ -167,12 +170,12 @@ export default function SearchPage() {
 
         </aside>
 
-        {/* Right Buses list & Seat picker accordion */}
+        {/* Column 2: Center Bus Results List */}
         <div className="search-results-col">
           
           <div className="search-results-info">
             <span>Found <strong>{filteredBuses.length}</strong> matching luxury buses</span>
-            <span className="highlight-cyan">• All buses include AC & Live Telematics</span>
+            <span className="highlight-cyan">• Live Telematics Included</span>
           </div>
 
           {filteredBuses.map((bus) => (
@@ -182,17 +185,33 @@ export default function SearchPage() {
                 isSelected={selectedBusId === bus.id}
                 onSelectSeats={handleSelectSeats}
               />
-
-              {/* Inline Seat Selector Drawer */}
-              {selectedBusId === bus.id && (
-                <div className="search-seat-picker-drawer">
-                  <SeatPicker bus={bus} onComplete={handleBookingComplete} />
-                </div>
-              )}
             </div>
           ))}
 
         </div>
+
+        {/* Column 3: Right Sidebar Panel (Seat Selection & Passenger Information) */}
+        <aside className="search-right-checkout-panel">
+          {selectedBus ? (
+            <div className="relative">
+              <SeatPicker
+                bus={selectedBus}
+                onComplete={handleBookingComplete}
+                onClose={() => setSelectedBusId(null)}
+              />
+            </div>
+          ) : (
+            <div className="search-right-empty-card">
+              <div className="search-empty-icon-box">
+                <Bus size={28} className="highlight-cyan" />
+              </div>
+              <h4 className="search-empty-title">Select Your Seat Layout</h4>
+              <p className="search-empty-desc">
+                Click <strong>Select Seat Layout</strong> on any luxury coach to interactively view the seat map and enter passenger information.
+              </p>
+            </div>
+          )}
+        </aside>
 
       </div>
 

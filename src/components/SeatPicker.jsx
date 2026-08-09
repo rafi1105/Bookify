@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck, X } from 'lucide-react';
 
-export default function SeatPicker({ bus, onComplete }) {
+export default function SeatPicker({ bus, onComplete, onClose }) {
   const [deck, setDeck] = useState('lower');
   const [selectedSeats, setSelectedSeats] = useState(['L4']);
   const [boardingPoint, setBoardingPoint] = useState(bus.boardingPoints[0]);
@@ -86,13 +86,24 @@ export default function SeatPicker({ bus, onComplete }) {
   return (
     <div className="seat-picker-layout">
       
-      {/* Left 7 cols: Bus Deck & Seat Grid */}
+      {/* Panel 1: Select Your Seat Layout */}
       <div className="seat-picker-deck-col">
         <div className="seat-picker-card">
           
           <div className="seat-picker-header">
             <div className="seat-picker-header-titles">
-              <h4 className="seat-picker-title">Select Your Seat Layout</h4>
+              <div className="flex items-center justify-between w-full">
+                <h4 className="seat-picker-title">Select Your Seat Layout</h4>
+                {onClose && (
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="p-1 rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
               <p className="seat-picker-subtitle">Click on available seats to reserve (Max 4 seats)</p>
             </div>
 
@@ -192,7 +203,7 @@ export default function SeatPicker({ bus, onComplete }) {
         </div>
       </div>
 
-      {/* Right 5 cols: Passenger Details & Solid CTA */}
+      {/* Panel 2: Passenger Information */}
       <div className="seat-passenger-col">
         <form onSubmit={handleCheckoutSubmit} className="seat-checkout-card">
           
