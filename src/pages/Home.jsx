@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ShieldCheck, Star, ArrowRight, Smartphone, Navigation } from 'lucide-react';
+import { ShieldCheck, Star, ArrowRight, Smartphone, Navigation, Clock, MapPin } from 'lucide-react';
 
 import SearchWidget from '../components/SearchWidget';
 import OperatorSaaSPreview from '../components/OperatorSaaSPreview';
@@ -131,7 +131,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. POPULAR ROUTES & DEALS (3-COLUMN GRID) */}
+      {/* 3. POPULAR ROUTES & DEALS (PURE LUCIDE ICONS) */}
       <section className="container space-y-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -175,9 +175,11 @@ export default function Home() {
                 <h4 className="full-card-title">{route.from} ➔ {route.to}</h4>
 
                 <div className="full-card-meta">
-                  <span>⏱ {route.duration}</span>
+                  <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>{route.duration}</span>
                   <span>•</span>
-                  <span>📍 {route.distance}</span>
+                  <MapPin className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>{route.distance}</span>
                 </div>
 
                 <div className="full-card-tags-row">

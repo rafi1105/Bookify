@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ArrowRight, Star } from 'lucide-react';
+import { Search, ArrowRight, Star, Clock, MapPin } from 'lucide-react';
 import { POPULAR_ROUTES } from '../data/mockData';
 
 import scenicRouteImg from '../assets/images/scenic-route.jpg';
@@ -70,9 +70,11 @@ export default function RoutesPage() {
               <h4 className="full-card-title">{route.from} ➔ {route.to}</h4>
 
               <div className="full-card-meta">
-                <span>⏱ {route.duration}</span>
+                <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                <span>{route.duration}</span>
                 <span>•</span>
-                <span>📍 {route.distance}</span>
+                <MapPin className="w-3.5 h-3.5 text-indigo-400" />
+                <span>{route.distance}</span>
               </div>
 
               <div className="full-card-tags-row">
