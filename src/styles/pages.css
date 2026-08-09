@@ -879,11 +879,11 @@
 
 .full-card-price-badge {
   background: var(--cyan-primary);
-  color: #0f172a;
+  color: var(--text-inverse);
   padding: 0.35rem 0.85rem;
   border-radius: var(--radius-lg);
   font-size: 0.9rem;
-  font-weight: 900;
+  font-weight: 600;
   font-family: var(--font-display);
   box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
 }

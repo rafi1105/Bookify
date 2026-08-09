@@ -121,7 +121,7 @@ export default function SearchWidget({ compact = false, initialFrom = '', initia
 
         {/* Search CTA */}
         <div className="search-grid-cta-cell">
-          <button type="submit" className="btn-search-cta">
+          <button type="submit" className="primary-btn-liquid">
             <Search size={18} />
             <span>Search Available Buses</span>
           </button>
