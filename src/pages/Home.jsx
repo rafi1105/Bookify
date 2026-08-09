@@ -48,7 +48,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div ref={heroRef} className="home-page">
+    <div ref={heroRef} className="space-y-20 pb-20 overflow-hidden">
       
       {/* 1. HERO SECTION WITH HIGH-CONTRAST FULL BG SHOWCASE */}
       <section className="hero-wrapper">
@@ -64,18 +64,18 @@ export default function Home() {
 
         <div className="hero-content">
           
-          <div className="hero-header-block">
+          <div className="space-y-5 max-w-4xl mx-auto">
             
             {/* Top Pill Badge */}
             <div className="hero-fade hero-pill-badge">
-              <span className="hero-ping-dot animate-ping"></span>
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
               <span>NEXT-GEN INTERCITY TRANSIT</span>
             </div>
 
             {/* Headline */}
             <h1 className="hero-fade hero-headline">
               Intercity Travel Redefined.<br />
-              Book <span className="highlight-cyan">VIP Sleeper Pods.</span>
+              Book <span className="text-cyan-400">VIP Sleeper Pods.</span>
             </h1>
 
             {/* Subtitle */}
@@ -85,22 +85,22 @@ export default function Home() {
           </div>
 
           {/* Redesigned Search Widget */}
-          <div className="hero-fade hero-search-wrapper">
+          <div className="hero-fade max-w-5xl mx-auto w-full">
             <SearchWidget />
           </div>
 
           {/* Quick Feature Badges */}
-          <div className="hero-fade hero-badges-row">
+          <div className="hero-fade flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-200">
             <div className="badge-tag">
-              <ShieldCheck size={16} />
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>Zero Cancellation Fee Guarantee</span>
             </div>
             <div className="badge-tag">
-              <Navigation size={16} />
+              <Navigation className="w-4 h-4 text-cyan-400" />
               <span>Sub-Second Live Satellite GPS</span>
             </div>
             <div className="badge-tag">
-              <Star size={16} />
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
               <span>4.9/5 Average Passenger Rating</span>
             </div>
           </div>
@@ -112,91 +112,107 @@ export default function Home() {
       {/* 2. STATS TICKER */}
       <section ref={statsRef} className="container">
         <div className="stats-grid">
-          <div className="stats-item">
-            <h3 className="stat-number highlight-cyan">500+</h3>
+          <div className="stats-item space-y-1">
+            <h3 className="stat-number text-cyan-500">500+</h3>
             <p className="stat-label">Active Daily Routes</p>
           </div>
-          <div className="stats-item">
-            <h3 className="stat-number">12M+</h3>
+          <div className="stats-item space-y-1">
+            <h3 className="stat-number theme-text-main">12M+</h3>
             <p className="stat-label">Happy Travelers</p>
           </div>
-          <div className="stats-item">
-            <h3 className="stat-number stat-emerald">99.8%</h3>
+          <div className="stats-item space-y-1">
+            <h3 className="stat-number text-emerald-500">99.8%</h3>
             <p className="stat-label">On-Time Dispatch</p>
           </div>
-          <div className="stats-item">
-            <h3 className="stat-number stat-purple">2,400+</h3>
+          <div className="stats-item space-y-1">
+            <h3 className="stat-number text-purple-500">2,400+</h3>
             <p className="stat-label">Verified Fleet Buses</p>
           </div>
         </div>
       </section>
 
-      {/* 3. POPULAR ROUTES & DEALS */}
-      <section className="container">
-        <div className="routes-header-row">
-          <div className="routes-header-info">
-            <span className="page-badge">Popular Corridors</span>
-            <h2 className="page-title">Top Trending Express Routes</h2>
+      {/* 3. POPULAR ROUTES — FULL COVER IMAGE CARDS */}
+      <section className="container space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <span className="text-xs font-bold text-cyan-500 uppercase tracking-widest">Popular Corridors</span>
+            <h2 className="text-3xl font-extrabold theme-text-main font-display">Top Trending Express Routes</h2>
           </div>
           <Link
             to="/routes"
-            className="routes-view-all-link"
+            className="text-xs font-bold text-cyan-500 hover:text-cyan-600 flex items-center space-x-1 transition-colors"
           >
             <span>View All 500+ Routes</span>
-            <ArrowRight size={16} />
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="routes-cards-grid">
-          {POPULAR_ROUTES.slice(0, 6).map((route) => (
-            <div key={route.id} className="route-card">
-              <div className="route-card-media">
-                <img
-                  src={route.imageName === 'scenic-route.jpg' ? scenicRouteImg : route.imageName === 'city-metropolis.jpg' ? cityMetropolisImg : passengerExpImg}
-                  alt={route.from + ' to ' + route.to}
-                  className="route-card-img"
-                />
-                <div className="route-daily-badge">
-                  {route.tripsPerDay} Trips Daily
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {POPULAR_ROUTES.slice(0, 6).map((route) => {
+            const cardImg = route.imageName === 'scenic-route.jpg' ? scenicRouteImg : route.imageName === 'city-metropolis.jpg' ? cityMetropolisImg : passengerExpImg;
+            
+            return (
+              <div key={route.id} className="route-cover-card group">
+                
+                {/* Full Bleed Background Image */}
+                <div className="route-cover-bg">
+                  <img
+                    src={cardImg}
+                    alt={route.from + ' to ' + route.to}
+                  />
                 </div>
-                <div className="route-price-tag">
-                  ${route.price.toFixed(2)}
-                </div>
-              </div>
+                <div className="route-cover-gradient"></div>
 
-              <div className="route-card-details">
-                <div className="route-card-top">
-                  <h4 className="route-card-title">{route.from} ➔ {route.to}</h4>
-                  <div className="route-card-rating">
-                    <Star size={14} />
+                {/* Top Badges */}
+                <div className="route-cover-top">
+                  <span className="px-3 py-1 rounded-full bg-slate-950/80 text-cyan-400 border border-cyan-500/30 text-xs font-bold backdrop-blur-md shadow-md">
+                    ⚡ {route.tripsPerDay} Trips Daily
+                  </span>
+                  <div className="flex items-center space-x-1 px-3 py-1 rounded-full bg-slate-950/80 text-amber-400 border border-amber-500/30 text-xs font-bold backdrop-blur-md shadow-md">
+                    <Star className="w-3.5 h-3.5 fill-amber-400" />
                     <span>{route.rating}</span>
                   </div>
                 </div>
 
-                <div className="route-card-meta">
-                  <span>⏱ {route.duration}</span>
-                  <span>•</span>
-                  <span>📍 {route.distance}</span>
-                </div>
-
-                <div className="route-card-tags">
-                  {route.tags.map((tag, i) => (
-                    <span key={i} className="badge-tag">
-                      {tag}
+                {/* Bottom Glassmorphic Content Block */}
+                <div className="route-cover-bottom">
+                  
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-black text-white font-display tracking-tight">
+                      {route.from} ➔ {route.to}
+                    </h4>
+                    <span className="route-price-tag">
+                      ${route.price.toFixed(2)}
                     </span>
-                  ))}
+                  </div>
+
+                  <div className="flex items-center space-x-3 text-xs text-slate-300">
+                    <span>⏱ {route.duration}</span>
+                    <span>•</span>
+                    <span>📍 {route.distance}</span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {route.tags.slice(0, 3).map((tag, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded-md bg-slate-900/80 text-slate-200 border border-slate-700/60 text-[10px] font-medium backdrop-blur-sm">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <Link
+                    to={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
+                    className="btn-search-cta mt-2"
+                  >
+                    <span>Check Bus Schedule</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+
                 </div>
 
-                <Link
-                  to={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
-                  className="btn-search-cta"
-                >
-                  <span>Check Bus Schedule</span>
-                  <ArrowRight size={14} />
-                </Link>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -206,69 +222,67 @@ export default function Home() {
       </section>
 
       {/* 5. PASSENGER TESTIMONIALS */}
-      <section className="container">
-        <div className="testimonials-section">
-          <div className="testimonials-header">
-            <span className="page-badge">Verified Traveler Reviews</span>
-            <h2 className="page-title">Loved By Over 12 Million Passengers</h2>
-          </div>
+      <section className="container space-y-8">
+        <div className="text-center space-y-2">
+          <span className="text-xs font-bold text-cyan-500 uppercase tracking-widest">Verified Traveler Reviews</span>
+          <h2 className="text-3xl font-extrabold theme-text-main font-display">Loved By Over 12 Million Passengers</h2>
+        </div>
 
-          <div className="testimonials-grid">
-            {TESTIMONIALS.map((t, idx) => (
-              <div key={idx} className="testimonial-card">
-                <div className="testimonial-stars">
-                  {[...Array(t.rating)].map((_, i) => (
-                    <Star key={i} size={16} />
-                  ))}
-                </div>
-                <p className="testimonial-text">"{t.text}"</p>
-                
-                <div className="testimonial-author">
-                  <img src={t.avatar} alt={t.name} className="testimonial-avatar" />
-                  <div className="testimonial-meta">
-                    <h5 className="testimonial-name">{t.name}</h5>
-                    <span className="testimonial-role">{t.role}</span>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {TESTIMONIALS.map((t, idx) => (
+            <div key={idx} className="glass-card p-6 space-y-4">
+              <div className="flex items-center space-x-1 text-amber-500">
+                {[...Array(t.rating)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-amber-500" />
+                ))}
+              </div>
+              <p className="theme-text-sub text-xs sm:text-sm leading-relaxed italic">"{t.text}"</p>
+              
+              <div className="flex items-center space-x-3 pt-2 border-t theme-border">
+                <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover border border-cyan-500" />
+                <div>
+                  <h5 className="text-xs font-bold theme-text-main">{t.name}</h5>
+                  <span className="text-[10px] theme-text-muted block">{t.role}</span>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* 6. MOBILE APP DOWNLOAD CTA */}
       <section className="container">
-        <div className="app-download-banner">
-          <div className="app-download-grid">
+        <div className="glass-panel p-8 md:p-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            <div className="app-download-content">
-              <span className="page-badge">
+            <div className="lg:col-span-7 space-y-5">
+              <span className="badge-tag text-cyan-500 font-bold">
                 DOWNLOAD BOOKIFY MOBILE APP
               </span>
-              <h2 className="app-download-title">
+              <h2 className="text-3xl sm:text-4xl font-extrabold theme-text-main font-display">
                 Get Instant Boarding Passes On Your Phone
               </h2>
-              <p className="app-download-desc">
+              <p className="theme-text-sub text-sm leading-relaxed max-w-xl">
                 Scan your QR boarding pass offline, track live bus ETA on lock screen widgets, and receive instant delay alerts. Available on iOS & Android.
               </p>
 
-              <div className="app-download-buttons">
+              <div className="flex flex-wrap gap-4 pt-2">
                 <a href="#download" className="btn-book-cta">
-                  <Smartphone size={16} />
+                  <Smartphone className="w-4 h-4" />
                   <span>App Store (iOS)</span>
                 </a>
-                <a href="#download" className="app-download-btn-secondary">
-                  <Smartphone size={16} />
+                <a href="#download" className="btn-swap-locations px-5 py-2.5 flex items-center space-x-2 font-bold text-xs">
+                  <Smartphone className="w-4 h-4" />
                   <span>Google Play (Android)</span>
                 </a>
               </div>
             </div>
 
-            <div className="app-download-media">
+            <div className="lg:col-span-5 flex justify-center">
               <img
                 src={mobileAppPassImg}
                 alt="Bookify Mobile App E-Ticket Pass"
-                className="app-download-mockup"
+                className="w-64 sm:w-72 h-auto rounded-3xl shadow-2xl border theme-border"
               />
             </div>
 
