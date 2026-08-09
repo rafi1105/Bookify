@@ -1912,6 +1912,20 @@
   border-radius: 9999px;
 }
 
+/* Ensure SeatPicker inside Right Panel renders as clean vertical 1-column cards */
+.search-right-checkout-panel .seat-picker-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+  width: 100% !important;
+}
+
+.search-right-checkout-panel .seat-picker-deck-col,
+.search-right-checkout-panel .seat-passenger-col {
+  grid-column: span 12 !important;
+  width: 100% !important;
+}
+
 .search-right-empty-card {
   padding: 2.25rem 1.5rem;
   border-radius: var(--radius-2xl);
