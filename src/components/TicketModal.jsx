@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Bus, CheckCircle2, Download, QrCode, Smartphone, X, MapPin } from 'lucide-react';
+import { Bus, CheckCircle2, Download, QrCode, Smartphone, X, MapPin, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function TicketModal({ bookingDetails, onClose }) {
@@ -8,9 +8,9 @@ export default function TicketModal({ bookingDetails, onClose }) {
 
   useEffect(() => {
     confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
+      particleCount: 80,
+      spread: 60,
+      origin: { y: 0.5 }
     });
   }, []);
 
@@ -19,7 +19,7 @@ export default function TicketModal({ bookingDetails, onClose }) {
   const { bus, seats, totalAmount, boardingPoint, passenger, bookingId, issueDate } = bookingDetails;
 
   return (
-    <dialog open className="ticket-dialog-backdrop">
+    <div className="ticket-dialog-backdrop" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="ticket-modal-card">
         
         {/* Close Button */}
@@ -34,25 +34,30 @@ export default function TicketModal({ bookingDetails, onClose }) {
         {/* Success Header */}
         <div className="ticket-modal-success-header">
           <div className="ticket-success-icon-box">
-            <CheckCircle2 size={32} className="animate-bounce" />
+            <CheckCircle2 size={32} />
           </div>
           <h3 className="ticket-modal-title">Booking Confirmed!</h3>
           <p className="ticket-modal-subtitle">
-            Your digital E-Ticket pass has been generated and emailed to <span className="highlight-cyan font-semibold">{passenger.email}</span>
+            Your official digital E-Ticket has been generated and sent to <span className="highlight-cyan font-semibold">{passenger.email}</span>
           </p>
         </div>
 
-        {/* Boarding Pass Ticket */}
+        {/* Luxury Boarding Pass Ticket */}
         <div className="ticket-boarding-pass">
           
-          {/* Pass Banner */}
+          {/* Top Gradient Banner */}
           <div className="ticket-pass-banner">
             <div className="ticket-banner-logo-block">
-              <Bus size={20} />
-              <span className="ticket-banner-title">BOOKIFY OFFICIAL PASS</span>
+              <div className="ticket-bus-icon-wrap">
+                <Bus size={18} />
+              </div>
+              <div className="ticket-banner-titles">
+                <span className="ticket-banner-title">BOOKIFY OFFICIAL E-PASS</span>
+                <span className="ticket-banner-operator">{bus.operator || 'Green Line Paribahan'}</span>
+              </div>
             </div>
             <div className="ticket-banner-meta">
-              <span className="ticket-banner-id">ID: {bookingId}</span>
+              <span className="ticket-banner-id">PASS #{bookingId}</span>
               <span className="ticket-banner-date">{issueDate}</span>
             </div>
           </div>
@@ -60,55 +65,86 @@ export default function TicketModal({ bookingDetails, onClose }) {
           {/* Ticket Body */}
           <div className="ticket-pass-body">
             
+            {/* Origin -> Destination Route Row */}
             <div className="ticket-route-row">
               <div className="ticket-route-point">
-                <span className="ticket-info-label">FROM</span>
+                <span className="ticket-info-label">DEPARTURE</span>
                 <h4 className="ticket-route-city">{bus.from}</h4>
                 <span className="ticket-route-time">{bus.departureTime}</span>
               </div>
-              <div className="ticket-direct-badge">
-                {bus.duration} Direct
+
+              <div className="ticket-route-middle">
+                <span className="ticket-direct-badge">{bus.duration} Direct Express</span>
+                <div className="ticket-route-track">
+                  <span className="ticket-track-dot"></span>
+                  <span className="ticket-track-line"></span>
+                  <ArrowRight size={14} className="ticket-track-arrow" />
+                  <span className="ticket-track-line"></span>
+                  <span className="ticket-track-dot"></span>
+                </div>
               </div>
+
               <div className="ticket-route-point dest">
-                <span className="ticket-info-label">TO</span>
+                <span className="ticket-info-label">ARRIVAL</span>
                 <h4 className="ticket-route-city">{bus.to}</h4>
                 <span className="ticket-route-time">{bus.arrivalTime}</span>
               </div>
             </div>
 
+            {/* Passenger / Seat / Class Grid */}
             <div className="ticket-info-grid">
               <div className="ticket-info-item">
-                <span className="ticket-info-label">PASSENGER</span>
+                <span className="ticket-info-label">PASSENGER NAME</span>
                 <span className="ticket-info-val">{passenger.fullName}</span>
+                <span className="ticket-info-sub-val">{passenger.phone}</span>
               </div>
               <div className="ticket-info-item">
-                <span className="ticket-info-label">SEAT(S)</span>
+                <span className="ticket-info-label">CONFIRMED SEATS</span>
                 <span className="ticket-info-val cyan">{seats.join(', ')}</span>
+                <span className="ticket-info-sub-val">{seats.length} Passenger(s)</span>
               </div>
               <div className="ticket-info-item">
-                <span className="ticket-info-label">BUS CLASS</span>
-                <span className="ticket-info-val">{bus.busType.split(' ')[0]}</span>
+                <span className="ticket-info-label">COACH TYPE</span>
+                <span className="ticket-info-val">{bus.busType ? bus.busType.split('(')[0].trim() : 'Luxury AC'}</span>
+                <span className="ticket-info-sub-val">Air Suspension</span>
               </div>
             </div>
 
+            {/* Boarding Point Box */}
             <div className="ticket-boarding-location-box">
-              <MapPin size={16} className="highlight-cyan flex-shrink-0" />
-              <div>
-                <span className="ticket-info-val">Boarding Point: </span>
-                <span className="theme-text-sub">{boardingPoint}</span>
+              <div className="ticket-pin-icon-wrap">
+                <MapPin size={16} />
+              </div>
+              <div className="ticket-boarding-text">
+                <span className="ticket-info-label">DESIGNATED BOARDING COUNTER</span>
+                <span className="ticket-boarding-name">{boardingPoint}</span>
               </div>
             </div>
 
+            {/* Perforated Divider Line with Cutout Notches */}
+            <div className="ticket-tear-line">
+              <span className="ticket-notch notch-left"></span>
+              <div className="ticket-dash-line"></div>
+              <span className="ticket-notch notch-right"></span>
+            </div>
+
+            {/* Fare & QR Scanner Stub */}
             <div className="ticket-fare-qr-row">
               <div className="ticket-fare-block">
                 <span className="ticket-fare-label">TOTAL FARE PAID</span>
-                <span className="ticket-fare-price">৳{totalAmount.toLocaleString()}</span>
-                <span className="ticket-pci-badge">MFS & Bank Verified Receipt</span>
+                <div className="ticket-fare-price-wrap">
+                  <span className="ticket-fare-price">৳{totalAmount.toLocaleString()}</span>
+                  <span className="ticket-fare-all-in">All Taxes Included</span>
+                </div>
+                <div className="ticket-pci-badge">
+                  <ShieldCheck size={13} className="text-emerald-400" />
+                  <span>Verified E-Ticket • MFS & Bank Authorized</span>
+                </div>
               </div>
 
               <div className="ticket-qr-container">
-                <QrCode size={56} className="ticket-qr-code" />
-                <span className="ticket-qr-label">SCAN BOARDING</span>
+                <QrCode size={54} className="ticket-qr-code" />
+                <span className="ticket-qr-label">SCAN TO BOARD</span>
               </div>
             </div>
 
@@ -116,18 +152,21 @@ export default function TicketModal({ bookingDetails, onClose }) {
 
         </div>
 
-        {/* Modal Actions */}
+        {/* Modal Action Buttons */}
         <div className="ticket-modal-actions">
           <button
-            onClick={() => alert(`Downloading E-Ticket PDF for ${bookingId}...`)}
+            onClick={() => alert(`Downloading official PDF E-Ticket for Booking #${bookingId}...`)}
             className="btn-ticket-download"
           >
-            <Download size={16} className="highlight-cyan" />
-            <span>Save PDF E-Ticket</span>
+            <Download size={16} className="btn-icon-cyan" />
+            <span>Save PDF Boarding Pass</span>
           </button>
 
           <button
-            onClick={() => navigate('/my-bookings')}
+            onClick={() => {
+              onClose();
+              navigate('/my-bookings');
+            }}
             className="btn-ticket-track"
           >
             <Smartphone size={16} />
@@ -136,6 +175,6 @@ export default function TicketModal({ bookingDetails, onClose }) {
         </div>
 
       </div>
-    </dialog>
+    </div>
   );
 }
