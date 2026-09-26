@@ -6,8 +6,8 @@ import CustomDatePicker from './CustomDatePicker';
 
 export default function SearchWidget({ compact = false, initialFrom = '', initialTo = '', initialDate = '2026-08-15' }) {
   const navigate = useNavigate();
-  const [fromCity, setFromCity] = useState(initialFrom || 'New York, NY');
-  const [toCity, setToCity] = useState(initialTo || 'Boston, MA');
+  const [fromCity, setFromCity] = useState(initialFrom || 'Dhaka');
+  const [toCity, setToCity] = useState(initialTo || 'Chattogram');
   const [date, setDate] = useState(initialDate || '2026-08-15');
   const [busClass, setBusClass] = useState('all');
   const [timeSlot, setTimeSlot] = useState('all');
@@ -36,9 +36,6 @@ export default function SearchWidget({ compact = false, initialFrom = '', initia
       {!compact && (
         <div className="search-widget-header">
           <div className="search-widget-header-title-row">
-            <span className="search-widget-icon-box">
-              <Bus size={20} />
-            </span>
             <div className="search-widget-title-block">
               <h3 className="search-widget-title">Find & Book Your Luxury Bus</h3>
               <p className="search-widget-subtitle">Search over 500+ daily intercity express routes with VIP amenities</p>
@@ -123,7 +120,7 @@ export default function SearchWidget({ compact = false, initialFrom = '', initia
         <div className="search-grid-cta-cell">
           <button type="submit" className="primary-btn-liquid">
             <Search size={18} />
-            <span>Search Available Buses</span>
+            <span>Search</span>
           </button>
         </div>
 

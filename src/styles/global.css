@@ -107,25 +107,22 @@ textarea::placeholder {
 
 /* Layout Container */
 .container {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1760px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: clamp(1rem, 2.5vw, 2.5rem);
+  padding-right: clamp(1rem, 2.5vw, 2.5rem);
 }
 
-@media (min-width: 640px) {
-  .container {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
+.container-fluid,
+.full-width-screen {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 2.5vw, 3.5rem);
+  padding-right: clamp(1rem, 2.5vw, 3.5rem);
 }
 
 /* Custom Scrollbar */

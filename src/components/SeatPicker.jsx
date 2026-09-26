@@ -8,9 +8,9 @@ export default function SeatPicker({ bus, onComplete, onClose }) {
   const [droppingPoint, setDroppingPoint] = useState(bus.droppingPoints[0]);
 
   const [passenger, setPassenger] = useState({
-    fullName: 'Alex Vance',
-    email: 'alex.vance@example.com',
-    phone: '+1 (555) 234-5678',
+    fullName: 'Tanvir Ahmed',
+    email: 'tanvir.ahmed@example.com',
+    phone: '+880 1712-345678',
     age: '28',
     gender: 'Male'
   });
@@ -31,18 +31,18 @@ export default function SeatPicker({ bus, onComplete, onClose }) {
   ];
 
   const upperSeats = [
-    { id: 'U1', label: '1U', status: 'available', price: bus.price + 5 },
-    { id: 'U2', label: '2U', status: 'available', price: bus.price + 5 },
-    { id: 'U3', label: '3U', status: 'female', price: bus.price + 5 },
-    { id: 'U4', label: '4U', status: 'available', price: bus.price + 5 },
-    { id: 'U5', label: '5U', status: 'occupied', price: bus.price + 5 },
-    { id: 'U6', label: '6U', status: 'available', price: bus.price + 5 },
-    { id: 'U7', label: '7U', status: 'available', price: bus.price + 5 },
-    { id: 'U8', label: '8U', status: 'available', price: bus.price + 5 },
-    { id: 'U9', label: '9U', status: 'occupied', price: bus.price + 5 },
-    { id: 'U10', label: '10U', status: 'available', price: bus.price + 5 },
-    { id: 'U11', label: '11U', status: 'available', price: bus.price + 5 },
-    { id: 'U12', label: '12U', status: 'available', price: bus.price + 5 },
+    { id: 'U1', label: '1U', status: 'available', price: bus.price + 200 },
+    { id: 'U2', label: '2U', status: 'available', price: bus.price + 200 },
+    { id: 'U3', label: '3U', status: 'female', price: bus.price + 200 },
+    { id: 'U4', label: '4U', status: 'available', price: bus.price + 200 },
+    { id: 'U5', label: '5U', status: 'occupied', price: bus.price + 200 },
+    { id: 'U6', label: '6U', status: 'available', price: bus.price + 200 },
+    { id: 'U7', label: '7U', status: 'available', price: bus.price + 200 },
+    { id: 'U8', label: '8U', status: 'available', price: bus.price + 200 },
+    { id: 'U9', label: '9U', status: 'occupied', price: bus.price + 200 },
+    { id: 'U10', label: '10U', status: 'available', price: bus.price + 200 },
+    { id: 'U11', label: '11U', status: 'available', price: bus.price + 200 },
+    { id: 'U12', label: '12U', status: 'available', price: bus.price + 200 },
   ];
 
   const currentSeats = deck === 'lower' ? lowerSeats : upperSeats;
@@ -64,7 +64,7 @@ export default function SeatPicker({ bus, onComplete, onClose }) {
   const calculateTotal = () => {
     return selectedSeats.reduce((acc, seatId) => {
       const isUpper = seatId.startsWith('U');
-      return acc + bus.price + (isUpper ? 5 : 0);
+      return acc + bus.price + (isUpper ? 200 : 0);
     }, 0);
   };
 
@@ -73,7 +73,7 @@ export default function SeatPicker({ bus, onComplete, onClose }) {
     const bookingDetails = {
       bus,
       seats: selectedSeats,
-      totalAmount: calculateTotal(),
+      totalAmount: calculateTotal() + 50,
       boardingPoint,
       droppingPoint,
       passenger,
@@ -282,15 +282,15 @@ export default function SeatPicker({ bus, onComplete, onClose }) {
             </div>
             <div className="seat-summary-row">
               <span>Base Ticket Price:</span>
-              <span>${bus.price.toFixed(2)} x {selectedSeats.length}</span>
+              <span>৳{bus.price.toLocaleString()} x {selectedSeats.length}</span>
             </div>
             <div className="seat-summary-row">
-              <span>Service Fee & GPS Tax:</span>
-              <span>$2.50</span>
+              <span>Service Fee & Expressway Insurance:</span>
+              <span>৳50</span>
             </div>
             <div className="seat-summary-total-row">
               <span>Total Payable Amount:</span>
-              <span className="seat-summary-total-price">${(calculateTotal() + 2.5).toFixed(2)}</span>
+              <span className="seat-summary-total-price">৳{(calculateTotal() + 50).toLocaleString()}</span>
             </div>
           </div>
 

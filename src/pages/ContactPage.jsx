@@ -22,7 +22,7 @@ export default function ContactPage() {
     },
     {
       q: "Are luggage fees included in the ticket price?",
-      a: "Yes! Every standard ticket includes 1 free under-bus luggage bag (up to 50 lbs) and 1 personal overhead carry-on bag."
+      a: "Yes! Every standard ticket includes 1 free under-bus luggage bag (up to 20 kg) and 1 personal overhead carry-on bag."
     },
     {
       q: "How can fleet operators partner with Bookify?",
@@ -49,30 +49,30 @@ export default function ContactPage() {
         
         {/* Contact Info & Terminal HQ Details */}
         <div className="contact-info-card">
-          <h3 className="contact-section-title">Bookify Global Headquarters</h3>
+          <h3 className="contact-section-title">Bookify Bangladesh Headquarters</h3>
 
           <div className="contact-info-list">
             <div className="contact-info-item">
               <MapPin className="contact-icon" />
               <div className="contact-info-text">
-                <strong className="contact-info-label">New York HQ Terminal</strong>
-                <span className="contact-info-value">450 W 33rd Street, Midtown Transit Center, New York, NY 10001</span>
+                <strong className="contact-info-label">Dhaka Corporate & Transit Hub</strong>
+                <span className="contact-info-value">Level 8, Concord Police Plaza, Gulshan-1, Dhaka-1212, Bangladesh</span>
               </div>
             </div>
 
             <div className="contact-info-item">
               <Phone className="contact-icon" />
               <div className="contact-info-text">
-                <strong className="contact-info-label">Toll-Free Support Line</strong>
-                <span className="contact-info-value">+1 (800) 555-BOOK (2665)</span>
+                <strong className="contact-info-label">24/7 Helpline & Toll-Free</strong>
+                <span className="contact-info-value">+880 9613-BOOKIFY (+880 9613-266543) / 16247</span>
               </div>
             </div>
 
             <div className="contact-info-item">
               <Mail className="contact-icon" />
               <div className="contact-info-text">
-                <strong className="contact-info-label">Official Email</strong>
-                <span className="contact-info-value">support@bookifyexpress.com</span>
+                <strong className="contact-info-label">Official Support Email</strong>
+                <span className="contact-info-value">support@bookify.com.bd</span>
               </div>
             </div>
           </div>
@@ -109,7 +109,7 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="contact-form-input"
-                    placeholder="e.g. Sarah Jenkins"
+                    placeholder="e.g. Tanvir Ahmed"
                   />
                 </div>
                 <div className="contact-form-group">
@@ -120,7 +120,7 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="contact-form-input"
-                    placeholder="sarah@example.com"
+                    placeholder="tanvir@example.com"
                   />
                 </div>
               </div>

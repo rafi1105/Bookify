@@ -6,10 +6,10 @@ export default function MyBookingsPage() {
   const [bookingIdInput, setBookingIdInput] = useState('BK-894210');
   const [activeBooking, setActiveBooking] = useState({
     bookingId: 'BK-894210',
-    passengerName: 'Alex Vance',
-    busName: 'Bookify Royale Sleeper #802',
-    from: 'New York, NY',
-    to: 'Boston, MA',
+    passengerName: 'Tanvir Ahmed',
+    busName: 'Green Line Scania Double Decker #GL-701',
+    from: 'Dhaka (Sayedabad Hub)',
+    to: 'Chattogram (Dampara Station)',
     date: 'Aug 15, 2026',
     departureTime: '07:30 AM',
     seats: ['L4'],
@@ -21,12 +21,12 @@ export default function MyBookingsPage() {
     if (bookingIdInput) {
       setActiveBooking({
         bookingId: bookingIdInput.toUpperCase(),
-        passengerName: 'Alex Vance',
-        busName: 'Bookify Express #104',
-        from: 'New York, NY',
-        to: 'Boston, MA',
+        passengerName: 'Tanvir Ahmed',
+        busName: 'Shohagh Scania Elite VIP #SH-904',
+        from: 'Dhaka (Panthapath Hub)',
+        to: "Cox's Bazar (Kolatoli Beach)",
         date: 'Aug 15, 2026',
-        departureTime: '07:30 AM',
+        departureTime: '10:30 PM',
         seats: ['L4', 'L5'],
         status: 'Confirmed & Live'
       });

@@ -63,7 +63,7 @@ export default function BusCard({ bus, onSelectSeats, isSelected = false }) {
         <div className="bus-pricing-col">
           <div className="bus-price-block">
             <span className="bus-price-label">Starting From</span>
-            <span className="bus-price-value">${bus.price.toFixed(2)}</span>
+            <span className="bus-price-value">৳{bus.price.toLocaleString()}</span>
             <span className="bus-seats-left">{bus.availableSeats} seats left</span>
           </div>
 

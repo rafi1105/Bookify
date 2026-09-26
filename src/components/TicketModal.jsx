@@ -102,8 +102,8 @@ export default function TicketModal({ bookingDetails, onClose }) {
             <div className="ticket-fare-qr-row">
               <div className="ticket-fare-block">
                 <span className="ticket-fare-label">TOTAL FARE PAID</span>
-                <span className="ticket-fare-price">${totalAmount.toFixed(2)}</span>
-                <span className="ticket-pci-badge">PCI DSS Verified Receipt</span>
+                <span className="ticket-fare-price">৳{totalAmount.toLocaleString()}</span>
+                <span className="ticket-pci-badge">MFS & Bank Verified Receipt</span>
               </div>
 
               <div className="ticket-qr-container">

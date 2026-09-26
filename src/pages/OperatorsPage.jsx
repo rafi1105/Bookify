@@ -69,7 +69,9 @@ export default function OperatorsPage() {
 
                 <div className="pricing-tier-price-row">
                   <span className="pricing-tier-amount">
-                    {billingPeriod === 'yearly' ? '$' + Math.floor(parseInt(plan.price.replace('$', '')) * 0.8) : plan.price}
+                    {billingPeriod === 'yearly'
+                      ? '৳' + Math.floor((parseInt(plan.price.replace(/[^0-9]/g, ''), 10) || 0) * 0.8).toLocaleString()
+                      : plan.price}
                   </span>
                   <span className="pricing-tier-period">{plan.period}</span>
                 </div>

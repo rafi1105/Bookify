@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Bus, MapPin, Navigation, PhoneCall } from 'lucide-react';
 
-export default function LiveGPSTracker({ busName = "Bookify Royale Sleeper #802", origin = "New York, NY", destination = "Boston, MA" }) {
+export default function LiveGPSTracker({ busName = "Green Line Scania Double Decker #GL-701", origin = "Dhaka (Sayedabad Hub)", destination = "Chattogram (Dampara Station)" }) {
   const [progress, setProgress] = useState(62);
-  const [speed, setSpeed] = useState(65);
-  const [eta, setEta] = useState(84);
+  const [speed, setSpeed] = useState(82);
+  const [eta, setEta] = useState(115);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((prev) => (prev >= 98 ? 15 : prev + 1));
-      setSpeed(62 + Math.floor(Math.random() * 8));
+      setSpeed(78 + Math.floor(Math.random() * 8));
     }, 3000);
     return () => clearInterval(timer);
   }, []);
@@ -37,7 +37,7 @@ export default function LiveGPSTracker({ busName = "Bookify Royale Sleeper #802"
         <div className="gps-header-right">
           <div className="gps-stat-block">
             <span className="gps-stat-label">Current Speed</span>
-            <span className="gps-stat-value cyan">{speed} MPH</span>
+            <span className="gps-stat-value cyan">{speed} KM/H</span>
           </div>
           <div className="gps-stat-divider"></div>
           <div className="gps-stat-block">
@@ -57,7 +57,7 @@ export default function LiveGPSTracker({ busName = "Bookify Royale Sleeper #802"
           </div>
           <div className="gps-endpoint-dest">
             <MapPin size={16} className="gps-endpoint-icon-dest" />
-            <span>{destination} (ETA 11:45 AM)</span>
+            <span>{destination} (ETA 01:00 PM)</span>
           </div>
         </div>
 
@@ -87,23 +87,24 @@ export default function LiveGPSTracker({ busName = "Bookify Royale Sleeper #802"
         <div className="gps-info-grid">
           <div className="gps-info-card">
             <span className="gps-info-label">NEXT SCHEDULED HALT</span>
-            <span className="gps-info-val">Hartford Highway Plaza</span>
-            <span className="gps-info-sub cyan">14 miles away (In 12 mins)</span>
+            <span className="gps-info-val">Highway Inn Food Court, Cumilla</span>
+            <span className="gps-info-sub cyan">24 km away (In 18 mins)</span>
           </div>
 
           <div className="gps-info-card">
             <span className="gps-info-label">LEAD DRIVER</span>
-            <span className="gps-info-val">Captain Robert Vance</span>
-            <span className="gps-info-sub emerald">12 Yrs Safety Record</span>
+            <span className="gps-info-val">Md. Rafiqul Islam (Lead Pilot)</span>
+            <span className="gps-info-sub emerald">14 Yrs Safety Record</span>
           </div>
 
           <div className="gps-info-card gps-info-action-card">
-            <div>
+            <div className="gps-status-col">
               <span className="gps-info-label">BUS STATUS</span>
               <span className="gps-info-val emerald">On Time (+0m)</span>
             </div>
-            <button className="gps-info-action-btn" title="Call driver">
-              <PhoneCall size={16} />
+            <button className="gps-info-action-btn" title="Call Highway Dispatch / Driver">
+              <PhoneCall size={14} />
+              <span>Call Dispatch</span>
             </button>
           </div>
         </div>

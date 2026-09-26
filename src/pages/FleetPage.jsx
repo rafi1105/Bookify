@@ -67,7 +67,7 @@ export default function FleetPage() {
                 <div className="fleet-card-footer">
                   <div className="fleet-fare-block">
                     <span className="fleet-fare-label">Average Fare</span>
-                    <span className="fleet-fare-price">${bus.basePrice.toFixed(2)}</span>
+                    <span className="fleet-fare-price">৳{bus.basePrice.toLocaleString()}</span>
                   </div>
 
                   <Link

@@ -2,26 +2,27 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, ChevronDown, Search, Check, Building2, Sparkles, X } from 'lucide-react';
 
 export const CITY_OPTIONS = [
-  { city: 'New York, NY', terminal: 'Port Authority Bus Terminal', state: 'New York', popular: true, busesDaily: 48 },
-  { city: 'Boston, MA', terminal: 'South Station Express Hub', state: 'Massachusetts', popular: true, busesDaily: 36 },
-  { city: 'Washington, DC', terminal: 'Union Station Upper Deck', state: 'District of Columbia', popular: true, busesDaily: 32 },
-  { city: 'Philadelphia, PA', terminal: '30th Street Transit Concourse', state: 'Pennsylvania', popular: true, busesDaily: 28 },
-  { city: 'Los Angeles, CA', terminal: 'Union Station Gateway Plaza', state: 'California', popular: true, busesDaily: 42 },
-  { city: 'Las Vegas, NV', terminal: 'South Strip Intermodal Terminal', state: 'Nevada', popular: true, busesDaily: 38 },
-  { city: 'Miami, FL', terminal: 'Miami Airport Intermodal Station', state: 'Florida', popular: true, busesDaily: 34 },
-  { city: 'Orlando, FL', terminal: 'Orlando Downtown Transit Hub', state: 'Florida', popular: true, busesDaily: 30 },
-  { city: 'Chicago, IL', terminal: 'Union Station Coach Concourse', state: 'Illinois', popular: true, busesDaily: 40 },
-  { city: 'Detroit, MI', terminal: 'Rosa Parks Transit Center', state: 'Michigan', popular: false, busesDaily: 20 },
-  { city: 'Seattle, WA', terminal: 'King Street Coach Terminal', state: 'Washington', popular: false, busesDaily: 22 },
-  { city: 'Portland, OR', terminal: 'Curbside Downtown Transit Plaza', state: 'Oregon', popular: false, busesDaily: 18 },
-  { city: 'San Francisco, CA', terminal: 'Salesforce Transit Center', state: 'California', popular: false, busesDaily: 24 },
-  { city: 'Austin, TX', terminal: 'Downtown Metro Intercity Hub', state: 'Texas', popular: false, busesDaily: 26 },
-  { city: 'Atlanta, GA', terminal: 'Civic Center Bus Concourse', state: 'Georgia', popular: false, busesDaily: 25 },
+  { city: 'Dhaka', terminal: 'Sayedabad & Arambagh Central Hub', state: 'Dhaka Division', popular: true, busesDaily: 140 },
+  { city: 'Chattogram', terminal: 'Dampara Bus Station / AK Khan', state: 'Chattogram Division', popular: true, busesDaily: 95 },
+  { city: "Cox's Bazar", terminal: 'Kolatoli Beach Terminal & Dolphin Mor', state: 'Chattogram Division', popular: true, busesDaily: 80 },
+  { city: 'Sylhet', terminal: 'Kadamtoli Central Bus Terminal', state: 'Sylhet Division', popular: true, busesDaily: 65 },
+  { city: 'Rajshahi', terminal: 'Shiroil Bus Terminal / Railgate', state: 'Rajshahi Division', popular: true, busesDaily: 50 },
+  { city: 'Khulna', terminal: 'Sonadanga Central Bus Terminal', state: 'Khulna Division', popular: true, busesDaily: 45 },
+  { city: 'Barishal', terminal: 'Nathullabad Central Terminal (Padma Exp)', state: 'Barishal Division', popular: true, busesDaily: 48 },
+  { city: 'Rangpur', terminal: 'Modern Mor Intercity Terminal', state: 'Rangpur Division', popular: false, busesDaily: 35 },
+  { city: 'Bogura', terminal: 'Charmatha Central Bus Terminal', state: 'Rajshahi Division', popular: false, busesDaily: 40 },
+  { city: 'Cumilla', terminal: 'Paduar Bazar World Road Concourse', state: 'Chattogram Division', popular: false, busesDaily: 38 },
+  { city: 'Sreemangal', terminal: 'Habiganj Road Tea Valley Terminal', state: 'Sylhet Division', popular: false, busesDaily: 28 },
+  { city: 'Kuakata', terminal: 'Zero Point Sagar Kannya Terminal', state: 'Barishal Division', popular: false, busesDaily: 24 },
+  { city: 'Bandarban', terminal: 'Meghla Tourist Concourse', state: 'Chattogram Division', popular: false, busesDaily: 22 },
+  { city: 'Mymensingh', terminal: 'Maskanda Intercity Bus Station', state: 'Mymensingh Division', popular: false, busesDaily: 32 },
+  { city: 'Feni', terminal: 'Mohipal Highway Transit Hub', state: 'Chattogram Division', popular: false, busesDaily: 30 },
+  { city: 'Kushtia', terminal: 'Chourhas Intercity Terminal', state: 'Khulna Division', popular: false, busesDaily: 25 },
 ];
 
 export default function CitySelect({
   label = 'City',
-  value = 'New York, NY',
+  value = 'Dhaka',
   onChange,
   iconType = 'origin',
   placeholder = 'Select station...',
@@ -119,7 +120,7 @@ export default function CitySelect({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search city, airport, or station..."
+                placeholder="Search city, terminal, or division (e.g. Dhaka, Dampara)..."
                 className="custom-select-search-input"
               />
               {searchQuery && (

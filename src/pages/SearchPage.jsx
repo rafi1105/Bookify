@@ -10,15 +10,15 @@ import { MOCK_BUSES } from '../data/mockData';
 
 export default function SearchPage() {
   const [searchParams] = useSearchParams();
-  const from = searchParams.get('from') || 'New York, NY';
-  const to = searchParams.get('to') || 'Boston, MA';
+  const from = searchParams.get('from') || 'Dhaka';
+  const to = searchParams.get('to') || 'Chattogram';
 
   const [selectedBusId, setSelectedBusId] = useState(null);
   const [activeBookingDetails, setActiveBookingDetails] = useState(null);
 
   // Filters State
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [maxPrice, setMaxPrice] = useState(60);
+  const [maxPrice, setMaxPrice] = useState(2500);
   const [sortBy, setSortBy] = useState('departure');
 
   // Selected Bus Object
@@ -26,6 +26,15 @@ export default function SearchPage() {
 
   // Filter Buses
   const filteredBuses = MOCK_BUSES.filter((bus) => {
+    // If specific route query is provided and has matches in our fleet, show matching routes
+    const hasRouteMatch = MOCK_BUSES.some(
+      (b) => b.from.toLowerCase() === from.toLowerCase() && b.to.toLowerCase() === to.toLowerCase()
+    );
+    if (hasRouteMatch) {
+      if (bus.from.toLowerCase() !== from.toLowerCase() || bus.to.toLowerCase() !== to.toLowerCase()) {
+        return false;
+      }
+    }
     if (selectedCategory === 'sleeper' && !bus.busType.toLowerCase().includes('sleeper')) return false;
     if (selectedCategory === 'seater' && !bus.busType.toLowerCase().includes('seater')) return false;
     if (bus.price > maxPrice) return false;
@@ -50,7 +59,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="page-container search-page container">
+    <div className="page-container search-page full-width-screen">
       
       {/* Search Header Widget */}
       <div className="search-header-container">
@@ -84,7 +93,7 @@ export default function SearchPage() {
             <button
               onClick={() => {
                 setSelectedCategory('all');
-                setMaxPrice(60);
+                setMaxPrice(2500);
                 setSortBy('departure');
               }}
               className="filters-reset-btn"
@@ -136,13 +145,13 @@ export default function SearchPage() {
           <div className="filter-price-slider">
             <div className="filter-price-row">
               <span className="filter-label">Max Price</span>
-              <span className="highlight-cyan">${maxPrice}</span>
+              <span className="highlight-cyan">৳{maxPrice.toLocaleString()}</span>
             </div>
             <input
               type="range"
-              min="20"
-              max="70"
-              step="5"
+              min="800"
+              max="3000"
+              step="50"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="filter-range-slider"
