@@ -2793,47 +2793,21 @@
   overflow: hidden;
 }
 
-.gps-progress-bar {
-  height: 100%;
-  background-color: var(--cyan-primary);
-  transition: width 1s ease-out;
+.gps-progress-track {
+  appearance: none;
+  accent-color: var(--cyan-primary);
 }
 
-.gps-bus-marker-wrapper {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  transition: left 1s ease-out;
-}
-
-.gps-bus-marker-icon-box {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background-color: var(--cyan-primary);
-  color: var(--text-inverse);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-md);
-  border: 2px solid #ffffff;
-}
-
-.gps-bus-tooltip {
-  position: absolute;
-  top: -1.75rem;
-  left: 50%;
-  transform: translateX(-50%);
+.gps-progress-track::-webkit-progress-bar {
   background-color: var(--bg-card);
-  color: var(--cyan-primary);
-  font-size: 0.625rem;
-  font-weight: 700;
-  padding: 0.125rem 0.5rem;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--border-color);
-  white-space: nowrap;
-  box-shadow: var(--shadow-md);
+}
+
+.gps-progress-track::-webkit-progress-value {
+  background-color: var(--cyan-primary);
+}
+
+.gps-progress-track::-moz-progress-bar {
+  background-color: var(--cyan-primary);
 }
 
 .gps-info-grid {

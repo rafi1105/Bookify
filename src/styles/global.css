@@ -22,7 +22,13 @@ body {
   font-family: var(--font-sans);
   line-height: 1.5;
   min-height: 100vh;
+  overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background-color: var(--cyan-primary);
+  color: #000000;
 }
 
 h1,

@@ -1,82 +1,58 @@
-import React, { useState } from 'react';
-import { Search, Download, RefreshCw, XCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Download, RefreshCw, XCircle } from 'lucide-react';
 import LiveGPSTracker from '../components/LiveGPSTracker';
+import { assignScenarios } from '../lib/tripSimulation.js';
+
+const demoTrips = [
+  { bookingId: 'BK-894210', busName: 'Demo Coach 101', from: 'Dhaka', to: 'Chattogram', departureTime: '07:30 AM', seats: ['L4'] },
+  { bookingId: 'BK-894211', busName: 'Demo Coach 202', from: 'Dhaka', to: "Cox’s Bazar", departureTime: '10:30 PM', seats: ['L4', 'L5'] },
+  { bookingId: 'BK-894212', busName: 'Demo Coach 303', from: 'Dhaka', to: 'Bogura', departureTime: '08:00 AM', seats: ['A2'] },
+];
 
 export default function MyBookingsPage() {
-  const [bookingIdInput, setBookingIdInput] = useState('BK-894210');
-  const [activeBooking, setActiveBooking] = useState({
-    bookingId: 'BK-894210',
-    passengerName: 'Tanvir Ahmed',
-    busName: 'Green Line Scania Double Decker #GL-701',
-    from: 'Dhaka (Sayedabad Hub)',
-    to: 'Chattogram (Dampara Station)',
-    date: 'Aug 15, 2026',
-    departureTime: '07:30 AM',
-    seats: ['L4'],
-    status: 'Confirmed & Live'
-  });
+  const [selectedTrip, setSelectedTrip] = useState(0);
+  const [scenarios] = useState(() => assignScenarios());
+  const [tick, setTick] = useState(0);
+  const activeBooking = demoTrips[selectedTrip];
 
-  const handleLookup = (e) => {
-    e.preventDefault();
-    if (bookingIdInput) {
-      setActiveBooking({
-        bookingId: bookingIdInput.toUpperCase(),
-        passengerName: 'Tanvir Ahmed',
-        busName: 'Shohagh Scania Elite VIP #SH-904',
-        from: 'Dhaka (Panthapath Hub)',
-        to: "Cox's Bazar (Kolatoli Beach)",
-        date: 'Aug 15, 2026',
-        departureTime: '10:30 PM',
-        seats: ['L4', 'L5'],
-        status: 'Confirmed & Live'
-      });
-    }
-  };
+  useEffect(() => {
+    const timer = setInterval(() => setTick((current) => current + 1), 3000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="page-container">
-      
       <div className="page-header">
-        <span className="page-badge">
-          MY BOOKINGS & LIVE TRACKER
-        </span>
-        <h1 className="page-title">
-          Manage Tickets & Live Bus GPS
-        </h1>
-        <p className="page-subtitle">
-          Enter your Booking Reference ID to view live satellite bus telemetry, download digital boarding passes, or reschedule.
-        </p>
-
-        {/* Lookup Bar */}
-        <form onSubmit={handleLookup} className="booking-lookup-form">
-          <input
-            type="text"
-            value={bookingIdInput}
-            onChange={(e) => setBookingIdInput(e.target.value)}
-            placeholder="Enter Booking ID (e.g. BK-894210)"
+        <span className="page-badge">MY BOOKINGS</span>
+        <h1 className="page-title">Manage Tickets & Track Your Bus</h1>
+        <p className="page-subtitle">Choose a demo booking to see simulated trip progress.</p>
+        <div className="booking-lookup-form">
+          <select
+            aria-label="Demo booking"
             className="booking-lookup-input"
-          />
-          <button
-            type="submit"
-            className="booking-lookup-btn"
+            value={selectedTrip}
+            onChange={(event) => setSelectedTrip(Number(event.target.value))}
           >
-            <Search size={16} />
-            <span>Track</span>
+            {demoTrips.map((trip, index) => (
+              <option key={trip.bookingId} value={index}>{trip.bookingId} · {trip.busName}</option>
+            ))}
+          </select>
+          <button type="button" className="booking-lookup-btn" onClick={() => setTick(0)}>
+            <RefreshCw size={16} />
+            Replay
           </button>
-        </form>
+        </div>
       </div>
 
-      {/* Active Booking Telematics View */}
       {activeBooking && (
         <div className="booking-telematics-view">
-          
-          {/* Real-time GPS Tracker Component */}
           <LiveGPSTracker
             busName={activeBooking.busName}
             origin={activeBooking.from}
             destination={activeBooking.to}
+            scenario={scenarios[selectedTrip]}
+            tick={tick}
           />
-
           {/* Ticket Details & Actions */}
           <div className="booking-ticket-card">
             <div className="booking-ticket-header">
@@ -87,7 +63,7 @@ export default function MyBookingsPage() {
 
               <div>
                 <span className="booking-status-badge">
-                  {activeBooking.status}
+                  Demo booking
                 </span>
               </div>
             </div>
@@ -95,11 +71,11 @@ export default function MyBookingsPage() {
             <div className="booking-details-grid">
               <div className="booking-detail-item">
                 <span className="booking-detail-label">PASSENGER</span>
-                <span className="booking-detail-val">{activeBooking.passengerName}</span>
+                <span className="booking-detail-val">Demo Passenger</span>
               </div>
               <div className="booking-detail-item">
                 <span className="booking-detail-label">DATE & DEPARTURE</span>
-                <span className="booking-detail-val">{activeBooking.date} • {activeBooking.departureTime}</span>
+                <span className="booking-detail-val">{activeBooking.departureTime}</span>
               </div>
               <div className="booking-detail-item">
                 <span className="booking-detail-label">CONFIRMED SEATS</span>
