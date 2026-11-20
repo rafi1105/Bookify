@@ -1,3 +1,4 @@
+import { sendBookingEmail } from './bookingEmail.js';
 import express from 'express';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
@@ -78,12 +79,20 @@ function integer(input, min, max) {
 
 const orderFields = 'id,trip_id,passenger,contact,seats,total,state,expires,created_at,bookify_trips(*)';
 
+async function notifyBooking(db, kind, column, reference) {
+  if (!settings.RESEND_API_KEY || !settings.BOOKIFY_EMAIL_FROM || !settings.BOOKIFY_EMAIL_TEST_RECIPIENT) return;
+  const order = await read(table(db, 'orders').select(orderFields).eq(column, reference)
+    .eq('state', kind === 'ticket' ? 'confirmed' : 'refunded').maybeSingle());
+  if (order) await sendBookingEmail(order, kind);
+}
+
 async function refundOrder(db, stripe, order) {
   const refund = await stripe.refunds.create({ payment_intent: order.payment_intent }, {
     idempotencyKey: 'bookify-refund-' + order.id,
   });
   if (refund.status === 'succeeded') {
     await read(table(db, 'orders').update({ state: 'refunded' }).eq('id', order.id).eq('state', 'refund_required'));
+    await notifyBooking(db, 'refund', 'id', order.id).catch(() => console.error('Refund email will be retried by the Stripe webhook'));
   } else if (refund.status !== 'pending') {
     failure(502, 'Stripe could not process the refund');
   }
@@ -98,11 +107,13 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
   } catch {
     failure(400, 'Invalid Stripe signature');
   }
-  if (event.type === 'refund.updated' && !event.livemode && event.data.object.status === 'succeeded') {
+  if (['refund.created', 'refund.updated'].includes(event.type) && !event.livemode && event.data.object.status === 'succeeded') {
     const refund = event.data.object;
     if (typeof refund.payment_intent === 'string') {
-      await read(table(database(), 'orders').update({ state: 'refunded' })
+      const db = database();
+      await read(table(db, 'orders').update({ state: 'refunded' })
         .eq('payment_intent', refund.payment_intent).eq('state', 'refund_required').eq('total', refund.amount));
+      await notifyBooking(db, 'refund', 'payment_intent', refund.payment_intent);
     }
   }
   if (event.type === 'checkout.session.completed' && !event.livemode) {
@@ -113,6 +124,7 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
       if (booking && paidCheckout(payment, booking)) {
         const order = await read(db.rpc('bookify_fulfill', { order_id: booking.id, intent: payment.payment_intent }).single());
         if (order.state === 'refund_required') await refundOrder(db, stripe, order);
+        if (order.state === 'confirmed') await notifyBooking(db, 'ticket', 'id', order.id);
       }
     }
   }

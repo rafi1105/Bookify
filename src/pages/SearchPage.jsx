@@ -55,6 +55,7 @@ function Reservation({ trip }) {
       <label>Passenger name<input name="passenger" maxLength={100} required /></label>
       <label>Demo email<input name="contact" type="email" maxLength={150} placeholder="passenger@example.com" required /></label>
       {error && <p role="alert">{error}</p>}
+      <p>Cancel before {dhakaTime(trip.departure)} (Dhaka time) for {selected.length ? money(trip.fare * selected.length) + ' back' : 'a full refund'}. Passenger cancellations close at departure.</p>
       <button className="booking-lookup-btn" disabled={!selected.length || busy}>
         {busy ? 'Opening Stripe…' : 'Pay ' + money(trip.fare * selected.length) + ' with Stripe (test)'}
       </button>

@@ -8,7 +8,7 @@ Bookify is a three-role bus e-ticketing demo built with React/Vite, external CSS
 2. Apply supabase/migrations/20261120072108_bookify_hosted_demo.sql to a dedicated Supabase demo project. It creates the isolated Bookify tables, transactional functions and image bucket. For an empty project, this migration is self-contained. Optionally run supabase/seed.sql to generate next-week departures.
 3. Copy .env.example to .env. Set SUPABASE_URL, the server-only SUPABASE_SERVICE_ROLE_KEY, a random DEMO_SESSION_SECRET of at least 32 characters, and Stripe test credentials. Keep BOOKIFY_DEMO=true and use the same localhost origin as BOOKIFY_URL. Do not put secrets in VITE_ variables.
 4. Run npm run dev:api and npm run dev in two terminals.
-5. Forward Stripe test events to /api/stripe/webhook with Stripe CLI, and use its signing secret for STRIPE_WEBHOOK_SECRET. Subscribe to checkout.session.completed and refund.updated.
+5. Forward Stripe test events to /api/stripe/webhook with Stripe CLI, and use its signing secret for STRIPE_WEBHOOK_SECRET. Subscribe to checkout.session.completed, refund.created and refund.updated.
 
 ## Walk through the demo
 
@@ -29,3 +29,7 @@ Stripe test mode is deliberate. Commercial hosting and an eligible Stripe mercha
 ## Verification
 
 Run npm test, npm run lint and npm run build. Tests cover database approval, scheduling and inventory decisions using embedded Postgres, role and signature handling over local HTTP, and simulated tracking. A hosted smoke test additionally requires configured Supabase and Stripe test credentials.
+
+## Optional demo email
+
+Set RESEND_API_KEY, BOOKIFY_EMAIL_FROM (a sender permitted by Resend) and BOOKIFY_EMAIL_TEST_RECIPIENT in the server environment. Use the same test recipient address when booking. Resend sends a standalone e-ticket after Stripe confirms payment and a notice after Stripe confirms a refund. In both cases, provider idempotency keys reduce duplicate sends during webhook retries. My Bookings remains available with email disabled.

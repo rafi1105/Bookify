@@ -13,3 +13,8 @@ Feature: Bookify Stripe demo
     Given a passenger owns a booking with an active seat hold and an open Stripe session
     When the passenger resumes payment from My Bookings
     Then Stripe opens the same checkout session
+
+  Scenario: See cancellation terms and receive the ticket
+    Given a passenger selected seats for an upcoming departure
+    When the passenger reviews checkout and Stripe confirms payment
+    Then checkout shows the refund amount and deadline and the configured test recipient receives the boarding ticket

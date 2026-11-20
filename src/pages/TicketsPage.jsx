@@ -68,6 +68,7 @@ export default function TicketsPage() {
             <p>Board at {trip.boarding} · Drop off at {trip.dropping}</p>
             <p>{order.passenger} · Seats {order.seats.join(', ')} · {money(order.total)}</p>
             {activeTicket && <p>Ticket reference <strong>{order.id}</strong></p>}
+            {activeTicket && Date.parse(trip.departure) > Date.now() && <p>Cancel before {dhakaTime(trip.departure)} (Dhaka time) for a full refund of {money(order.total)}.</p>}
             <div className="bookify-actions">
               {order.state === 'held' && !expired && (
                 <button type="button" disabled={busy} onClick={() => act('/bookings/' + order.id + '/resume', {})}>

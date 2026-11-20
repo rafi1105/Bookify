@@ -9,3 +9,7 @@ Use integer BDT minor units. Express requests a 600-second atomic hold before cr
 The database serializes inventory transitions per trip and stores approved facts in immutable trip snapshots. A unique booking UUID is the printable ticket reference. Admin and vendor reports are derived from booking and trip state.
 
 A passenger can resume an interrupted checkout from My Bookings. POST /api/bookings/:id/resume reads only the passenger's held order and retrieves the existing Stripe Checkout Session. Return its URL only while the seat hold is unexpired and Stripe reports an open, unpaid session. A held order cannot start a second Stripe session through this endpoint. No schema changes are required.
+
+Before Stripe checkout and on a confirmed ticket, display the passenger cancellation deadline in Dhaka time and the full refund amount. Passenger-initiated cancellation is eligible strictly before scheduled departure. An operator cancellation refunds confirmed payments.
+
+For the test-only demo, optional Resend notifications go to an explicitly configured test recipient whose address matches the booking contact. Send a standalone boarding ticket after confirmed payment and a refund confirmation after a successful Stripe refund. Use a stable provider idempotency key per booking and event. Missing email settings leave booking and checkout available.
