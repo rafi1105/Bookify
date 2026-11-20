@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import SearchWidget from '../components/SearchWidget';
 import { api, dhakaTime, money } from '../lib/bookifyApi';
 
@@ -64,8 +65,9 @@ function Reservation({ trip }) {
   );
 }
 
-export default function SearchPage() {
-  const [params] = useSearchParams();
+export default function SearchPage({ today }) {
+  const router = useRouter();
+  const params = new URLSearchParams(router.asPath.split("?")[1]?.split("#")[0] || "");
   const [trips, setTrips] = useState([]);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState('');
@@ -89,7 +91,7 @@ export default function SearchPage() {
       .catch((problem) => { if (active) setError(problem.message); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [from, to, date, coach]);
+  }, [router.isReady, from, to, date, coach]);
 
   const startHour = { morning: 6, afternoon: 12, evening: 18 }[period];
   const visible = trips.filter((trip) => {
@@ -102,7 +104,7 @@ export default function SearchPage() {
     <div className="page-container search-page full-width-screen">
       <div className="search-header-container">
         <h1 className="search-page-title">Bus search results</h1>
-        <SearchWidget compact key={from + to + date} initialFrom={from} initialTo={to} initialDate={date || undefined} />
+        <SearchWidget compact key={from + to + date} initialFrom={from} initialTo={to} initialDate={date || today} />
       </div>
       <div className="search-layout-grid">
         <aside className="search-filters-sidebar bookify-form">
@@ -112,12 +114,12 @@ export default function SearchPage() {
           <label>Sort by<select value={sort} onChange={(event) => setSort(event.target.value)}>
             <option value="time">Earliest departure</option><option value="price">Lowest fare</option>
           </select></label>
-          <Link to="/workspace">Vendor and admin demo</Link>
+          <Link href="/workspace">Vendor and admin demo</Link>
         </aside>
         <section className="bookify-stack" aria-label="Departures">
           {loading && <p role="status">Loading departures…</p>}
           {error && <p role="alert">{error}</p>}
-          {!loading && !error && visible.length === 0 && <p>No matching departures. <Link to="/search">Show all trips</Link></p>}
+          {!loading && !error && visible.length === 0 && <p>No matching departures. <Link href="/search">Show all trips</Link></p>}
           {!loading && !error && visible.map((trip) => (
             <article className="bus-card-container bookify-panel" key={trip.id}>
               {trip.image && <img className="bookify-coach-image" src={trip.image} alt="" loading="lazy" />}

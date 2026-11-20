@@ -1,13 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import brandLogoImg from '../assets/images/bookify-brand-logo.jpg';
+import Link from 'next/link';
+import brandLogoImgAsset from '../assets/images/bookify-brand-logo.jpg';
+const brandLogoImg = brandLogoImgAsset.src;
 
 export default function Logo({ size = 'md' }) {
   const isSm = size === 'sm';
   const isLg = size === 'lg';
 
   return (
-    <Link to="/" className={`logo-container ${isSm ? 'logo-sm' : ''} ${isLg ? 'logo-lg' : ''}`}>
+    <Link href="/" className={`logo-container ${isSm ? 'logo-sm' : ''} ${isLg ? 'logo-lg' : ''}`}>
       {/* Brand Emblem Image */}
       <div className={`logo-emblem ${isSm ? 'lg' : ''} ${isLg ? 'sm' : ''}`}>
         <img src={brandLogoImg} alt="Bookify Brand Emblem" />

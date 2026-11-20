@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { ArrowRightLeft, Search, Sparkles } from 'lucide-react';
 import CitySelect from './CitySelect';
 import CustomDatePicker from './CustomDatePicker';
 
 export default function SearchWidget({ compact = false, initialFrom = '', initialTo = '', initialDate = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Dhaka' }).format(new Date()) }) {
-  const navigate = useNavigate();
+  const { push: navigate } = useRouter();
   const [fromCity, setFromCity] = useState(initialFrom || 'Dhaka');
   const [toCity, setToCity] = useState(initialTo || 'Chattogram');
   const [date, setDate] = useState(initialDate || new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Dhaka' }).format(new Date()));

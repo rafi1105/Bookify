@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ShieldCheck, CreditCard, Send, CheckCircle, Mail, Heart, Sparkles } from 'lucide-react';
 import Logo from './Logo';
-import footerBgImg from '../assets/images/footer-bg.png';
+import footerBgImgAsset from '../assets/images/footer-bg.png';
+const footerBgImg = footerBgImgAsset.src;
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -59,11 +60,11 @@ export default function Footer() {
               <span className="footer-title-bar"></span>
             </h4>
             <ul className="footer-links">
-              <li><Link to="/search">Search Bus Tickets</Link></li>
-              <li><Link to="/routes">Popular City Routes</Link></li>
-              <li><Link to="/fleet">VIP Bus Fleet Showcase</Link></li>
-              <li><Link to="/my-bookings">Manage Bookings</Link></li>
-              <li><Link to="/demo-tracker">Simulated Bus Tracker</Link></li>
+              <li><Link href="/search">Search Bus Tickets</Link></li>
+              <li><Link href="/routes">Popular City Routes</Link></li>
+              <li><Link href="/fleet">VIP Bus Fleet Showcase</Link></li>
+              <li><Link href="/my-bookings">Manage Bookings</Link></li>
+              <li><Link href="/demo-tracker">Simulated Bus Tracker</Link></li>
             </ul>
           </div>
 
@@ -74,11 +75,11 @@ export default function Footer() {
               <span className="footer-title-bar"></span>
             </h4>
             <ul className="footer-links">
-              <li><Link to="/operators">Bookify SaaS Platform</Link></li>
-              <li><Link to="/operators">Operator Dashboard Demo</Link></li>
-              <li><Link to="/operators">SaaS Pricing Tiers</Link></li>
-              <li><Link to="/operators">List Your Fleet</Link></li>
-              <li><Link to="/contact">Enterprise API Integrations</Link></li>
+              <li><Link href="/operators">Bookify SaaS Platform</Link></li>
+              <li><Link href="/operators">Operator Dashboard Demo</Link></li>
+              <li><Link href="/operators">SaaS Pricing Tiers</Link></li>
+              <li><Link href="/operators">List Your Fleet</Link></li>
+              <li><Link href="/contact">Enterprise API Integrations</Link></li>
             </ul>
           </div>
 
@@ -131,9 +132,9 @@ export default function Footer() {
           </div>
 
           <div className="footer-legal-links">
-            <Link to="/contact">Privacy Policy</Link>
-            <Link to="/contact">Terms of Service</Link>
-            <Link to="/contact">Security & PCI Compliance</Link>
+            <Link href="/contact">Privacy Policy</Link>
+            <Link href="/contact">Terms of Service</Link>
+            <Link href="/contact">Security & PCI Compliance</Link>
           </div>
         </div>
       </div>

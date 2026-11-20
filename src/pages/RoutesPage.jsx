@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Search, ArrowRight, Star, Clock, MapPin } from 'lucide-react';
 import { POPULAR_ROUTES } from '../data/mockData';
 
-import scenicRouteImg from '../assets/images/scenic-route.jpg';
-import cityMetropolisImg from '../assets/images/city-metropolis.jpg';
-import passengerExpImg from '../assets/images/passenger-exp.jpg';
+import scenicRouteImgAsset from '../assets/images/scenic-route.jpg';
+const scenicRouteImg = scenicRouteImgAsset.src;
+import cityMetropolisImgAsset from '../assets/images/city-metropolis.jpg';
+const cityMetropolisImg = cityMetropolisImgAsset.src;
+import passengerExpImgAsset from '../assets/images/passenger-exp.jpg';
+const passengerExpImg = passengerExpImgAsset.src;
 
 export default function RoutesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,7 +101,7 @@ export default function RoutesPage() {
               </div>
 
               <Link
-                to={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
+                href={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
                 className="full-card-cta-btn"
               >
                 <span>Check Bus Schedule</span>

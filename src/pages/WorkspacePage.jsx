@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { api, dhakaTime, money } from '../lib/bookifyApi';
 
 function Field({ label, name, type = 'text', ...props }) {
@@ -238,7 +238,7 @@ export default function WorkspacePage() {
         <button disabled={busy} key={vendor} onClick={() => update('/session', { role: 'vendor', vendor })}>{vendor} login</button>
       ))}
       <button disabled={busy} onClick={() => update('/session', { role: 'admin' })}>Admin login</button>
-      <Link to="/search">Search trips</Link><Link to="/my-bookings">My bookings</Link>
+      <Link href="/search">Search trips</Link><Link href="/my-bookings">My bookings</Link>
     </nav>
     {error && <p role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}

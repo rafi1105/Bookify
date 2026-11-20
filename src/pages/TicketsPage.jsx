@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { api, dhakaTime, money } from '../lib/bookifyApi';
 
 const statuses = { held: 'Awaiting payment', confirmed: 'Confirmed', refund_required: 'Refund pending', refunded: 'Refunded' };
 
 export default function TicketsPage() {
-  const [query] = useSearchParams();
+  const router = useRouter();
+  const query = new URLSearchParams(router.asPath.split("?")[1]?.split("#")[0] || "");
   const payment = query.get('payment');
   const [user, setUser] = useState(undefined);
   const [orders, setOrders] = useState([]);
@@ -44,7 +46,7 @@ export default function TicketsPage() {
     <section className="page-container bookify-stack">
       <div className="page-header">
         <h1 className="page-title">My bookings</h1>
-        <p><Link to="/search">Find a bus</Link> · <Link to="/demo-tracker">Simulated bus tracker</Link></p>
+        <p><Link href="/search">Find a bus</Link> · <Link href="/demo-tracker">Simulated bus tracker</Link></p>
       </div>
       {error && <p role="alert">{error}</p>}
       {payment === 'processing' && <p role="status">Stripe payment status updates below after verification.</p>}
@@ -75,7 +77,7 @@ export default function TicketsPage() {
                   Resume Stripe payment
                 </button>
               )}
-              {expired && <Link to="/search">Find another departure</Link>}
+              {expired && <Link href="/search">Find another departure</Link>}
               {activeTicket && <button type="button" onClick={(event) => {
                 const ticket = event.currentTarget.closest('.bookify-ticket');
                 ticket.classList.add('bookify-print-ticket');

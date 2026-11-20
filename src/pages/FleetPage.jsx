@@ -2,10 +2,13 @@ import React from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import { BUS_TYPES } from '../data/mockData';
 
-import sleeperBusImg from '../assets/images/sleeper-bus.jpg';
-import seaterBusImg from '../assets/images/seater-bus.jpg';
-import heroBusImg from '../assets/images/hero-bus.jpg';
-import { Link } from 'react-router-dom';
+import sleeperBusImgAsset from '../assets/images/sleeper-bus.jpg';
+const sleeperBusImg = sleeperBusImgAsset.src;
+import seaterBusImgAsset from '../assets/images/seater-bus.jpg';
+const seaterBusImg = seaterBusImgAsset.src;
+import heroBusImgAsset from '../assets/images/hero-bus.jpg';
+const heroBusImg = heroBusImgAsset.src;
+import Link from 'next/link';
 
 export default function FleetPage() {
   return (
@@ -71,7 +74,7 @@ export default function FleetPage() {
                   </div>
 
                   <Link
-                    to="/search"
+                    href="/search"
                     className="fleet-book-btn"
                   >
                     <span>Book On This Bus</span>

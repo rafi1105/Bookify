@@ -200,7 +200,7 @@ app.post('/api/checkout', async (req, res) => {
   const stripe = stripeClient();
   const db = database();
   if (settings.VERCEL && !settings.BOOKIFY_URL) failure(503, 'Bookify public URL is not configured');
-  const base = new URL(settings.BOOKIFY_URL || 'http://localhost:5173').origin;
+  const base = new URL(settings.BOOKIFY_URL || 'http://localhost:3000').origin;
   const { trip, seats, passenger, contact } = req.body;
   const email = value(contact, 150);
   if (!/^\S+@\S+\.\S+$/.test(email) || !Array.isArray(seats) || seats.length < 1 || seats.length > 6 ||

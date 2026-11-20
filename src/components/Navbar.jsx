@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import Logo from './Logo';
 import { useTheme } from '../context/ThemeContext';
@@ -7,7 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const location = useLocation();
+  const { pathname } = useRouter();
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -48,11 +49,11 @@ export default function Navbar() {
         {/* Center Navigation Links */}
         <nav className="nav-links-center">
           {navLinks.map((link) => {
-            const isActive = location.pathname === link.path;
+            const isActive = pathname === link.path;
             return (
               <Link
                 key={link.path}
-                to={link.path}
+                href={link.path}
                 className={`nav-capsule-link ${isActive ? 'active' : ''}`}
               >
                 {link.name}
@@ -80,7 +81,7 @@ export default function Navbar() {
           </button>
 
           {/* Solid White Pill CTA */}
-          <Link to="/search" className="btn-tourera-cta">
+          <Link href="/search" className="btn-tourera-cta">
             <span>Book Tickets</span>
           </Link>
 
@@ -114,9 +115,9 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <Link
                 key={link.path}
-                to={link.path}
+                href={link.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`mobile-nav-link ${location.pathname === link.path ? 'active' : ''}`}
+                className={`mobile-nav-link ${pathname === link.path ? 'active' : ''}`}
               >
                 {link.name}
               </Link>
@@ -125,7 +126,7 @@ export default function Navbar() {
 
           <div className="mobile-nav-footer">
             <Link
-              to="/search"
+              href="/search"
               onClick={() => setMobileMenuOpen(false)}
               className="btn-tourera-cta mobile-full"
             >

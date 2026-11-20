@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TrendingUp, Cpu, CheckCircle2 } from 'lucide-react';
-import dashboardImg from '../assets/images/operator-dashboard.jpg';
+import dashboardImgAsset from '../assets/images/operator-dashboard.jpg';
+const dashboardImg = dashboardImgAsset.src;
 
 export default function OperatorSaaSPreview() {
   const [activeTab, setActiveTab] = useState('revenue');

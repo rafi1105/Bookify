@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ShieldCheck, Star, ArrowRight, Smartphone, Navigation, CheckCircle2, Clock, MapPin } from 'lucide-react';
@@ -9,15 +9,20 @@ import OperatorSaaSPreview from '../components/OperatorSaaSPreview';
 import { POPULAR_ROUTES, TESTIMONIALS } from '../data/mockData';
 
 // Assets
-import heroFullBannerImg from '../assets/images/hero-full-banner.jpg';
-import passengerExpImg from '../assets/images/passenger-exp.jpg';
-import scenicRouteImg from '../assets/images/scenic-route.jpg';
-import cityMetropolisImg from '../assets/images/city-metropolis.jpg';
-import mobileAppPassImg from '../assets/images/mobile-app-pass.jpg';
+import heroFullBannerImgAsset from '../assets/images/hero-full-banner.jpg';
+const heroFullBannerImg = heroFullBannerImgAsset.src;
+import passengerExpImgAsset from '../assets/images/passenger-exp.jpg';
+const passengerExpImg = passengerExpImgAsset.src;
+import scenicRouteImgAsset from '../assets/images/scenic-route.jpg';
+const scenicRouteImg = scenicRouteImgAsset.src;
+import cityMetropolisImgAsset from '../assets/images/city-metropolis.jpg';
+const cityMetropolisImg = cityMetropolisImgAsset.src;
+import mobileAppPassImgAsset from '../assets/images/mobile-app-pass.jpg';
+const mobileAppPassImg = mobileAppPassImgAsset.src;
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Home() {
+export default function Home({ today }) {
   const heroRef = useRef(null);
   const statsRef = useRef(null);
 
@@ -86,7 +91,7 @@ export default function Home() {
 
           {/* Redesigned Search Widget */}
           <div className="hero-fade hero-search-wrapper">
-            <SearchWidget />
+            <SearchWidget initialDate={today} />
           </div>
 
           {/* Quick Feature Badges */}
@@ -139,7 +144,7 @@ export default function Home() {
             <h2 className="section-title">Top Trending Express Routes</h2>
           </div>
           <Link
-            to="/routes"
+            href="/routes"
             className="routes-view-all-link"
           >
             <span>View All 500+ Routes</span>
@@ -203,7 +208,7 @@ export default function Home() {
                 </div>
 
                 <Link
-                  to={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
+                  href={`/search?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
                   className="full-card-cta-btn"
                 >
                   <span>Check Bus Schedule</span>

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Bus, CheckCircle2, Download, QrCode, Smartphone, X, MapPin, ArrowRight, ShieldCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 
 export default function TicketModal({ bookingDetails, onClose }) {
-  const navigate = useNavigate();
+  const { push: navigate } = useRouter();
 
   useEffect(() => {
     confetti({
