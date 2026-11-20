@@ -62,8 +62,8 @@ export default function Footer() {
               <li><Link to="/search">Search Bus Tickets</Link></li>
               <li><Link to="/routes">Popular City Routes</Link></li>
               <li><Link to="/fleet">VIP Bus Fleet Showcase</Link></li>
-              <li><Link to="/my-bookings">Manage Bookings & GPS</Link></li>
-              <li><Link to="/my-bookings">Track Live Bus ETA</Link></li>
+              <li><Link to="/my-bookings">Manage Bookings</Link></li>
+              <li><Link to="/demo-tracker">Simulated Bus Tracker</Link></li>
             </ul>
           </div>
 

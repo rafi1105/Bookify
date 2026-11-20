@@ -12,6 +12,8 @@ import FleetPage from './pages/FleetPage';
 import RoutesPage from './pages/RoutesPage';
 import OperatorsPage from './pages/OperatorsPage';
 import MyBookingsPage from './pages/MyBookingsPage';
+import TicketsPage from './pages/TicketsPage';
+import WorkspacePage from './pages/WorkspacePage';
 import ContactPage from './pages/ContactPage';
 
 function ScrollToTop() {
@@ -36,7 +38,9 @@ export default function App() {
               <Route path="/fleet" element={<FleetPage />} />
               <Route path="/routes" element={<RoutesPage />} />
               <Route path="/operators" element={<OperatorsPage />} />
-              <Route path="/my-bookings" element={<MyBookingsPage />} />
+              <Route path="/my-bookings" element={<TicketsPage />} />
+              <Route path="/demo-tracker" element={<MyBookingsPage />} />
+              <Route path="/workspace" element={<WorkspacePage />} />
               <Route path="/contact" element={<ContactPage />} />
             </Routes>
           </main>

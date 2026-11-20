@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bus, ArrowRightLeft, Search, Sparkles, ShieldCheck } from 'lucide-react';
+import { ArrowRightLeft, Search, Sparkles } from 'lucide-react';
 import CitySelect from './CitySelect';
 import CustomDatePicker from './CustomDatePicker';
 
-export default function SearchWidget({ compact = false, initialFrom = '', initialTo = '', initialDate = '2026-08-15' }) {
+export default function SearchWidget({ compact = false, initialFrom = '', initialTo = '', initialDate = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Dhaka' }).format(new Date()) }) {
   const navigate = useNavigate();
   const [fromCity, setFromCity] = useState(initialFrom || 'Dhaka');
   const [toCity, setToCity] = useState(initialTo || 'Chattogram');
-  const [date, setDate] = useState(initialDate || '2026-08-15');
+  const [date, setDate] = useState(initialDate || new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Dhaka' }).format(new Date()));
   const [busClass, setBusClass] = useState('all');
   const [timeSlot, setTimeSlot] = useState('all');
   const [isSwapping, setIsSwapping] = useState(false);
@@ -38,7 +38,7 @@ export default function SearchWidget({ compact = false, initialFrom = '', initia
           <div className="search-widget-header-title-row">
             <div className="search-widget-title-block">
               <h3 className="search-widget-title">Find & Book Your Luxury Bus</h3>
-              <p className="search-widget-subtitle">Search over 500+ daily intercity express routes with VIP amenities</p>
+              <p className="search-widget-subtitle">Search approved intercity departures and compare fares.</p>
             </div>
           </div>
 
@@ -55,7 +55,7 @@ export default function SearchWidget({ compact = false, initialFrom = '', initia
               onClick={() => setBusClass('sleeper')}
               className={`search-class-pill-btn ${busClass === 'sleeper' ? 'active-sleeper' : ''}`}
             >
-              <Sparkles size={13} className="mr-1 inline" />
+              <Sparkles size={13} />
               Sleeper Pods
             </button>
             <button

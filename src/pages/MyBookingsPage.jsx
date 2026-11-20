@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, RefreshCw, XCircle } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import LiveGPSTracker from '../components/LiveGPSTracker';
 import { assignScenarios } from '../lib/tripSimulation.js';
 
@@ -23,8 +23,8 @@ export default function MyBookingsPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <span className="page-badge">MY BOOKINGS</span>
-        <h1 className="page-title">Manage Tickets & Track Your Bus</h1>
+        <span className="page-badge">DEMO TRACKER</span>
+        <h1 className="page-title">Simulated Bus Tracker</h1>
         <p className="page-subtitle">Choose a demo booking to see simulated trip progress.</p>
         <div className="booking-lookup-form">
           <select
@@ -53,60 +53,6 @@ export default function MyBookingsPage() {
             scenario={scenarios[selectedTrip]}
             tick={tick}
           />
-          {/* Ticket Details & Actions */}
-          <div className="booking-ticket-card">
-            <div className="booking-ticket-header">
-              <div className="booking-ref-block">
-                <span className="booking-ref-label">BOOKING REFERENCE</span>
-                <h3 className="booking-ref-val">{activeBooking.bookingId}</h3>
-              </div>
-
-              <div>
-                <span className="booking-status-badge">
-                  Demo booking
-                </span>
-              </div>
-            </div>
-
-            <div className="booking-details-grid">
-              <div className="booking-detail-item">
-                <span className="booking-detail-label">PASSENGER</span>
-                <span className="booking-detail-val">Demo Passenger</span>
-              </div>
-              <div className="booking-detail-item">
-                <span className="booking-detail-label">DATE & DEPARTURE</span>
-                <span className="booking-detail-val">{activeBooking.departureTime}</span>
-              </div>
-              <div className="booking-detail-item">
-                <span className="booking-detail-label">CONFIRMED SEATS</span>
-                <span className="booking-detail-val cyan">{activeBooking.seats.join(', ')}</span>
-              </div>
-              <div className="booking-detail-item">
-                <span className="booking-detail-label">CANCELLATION POLICY</span>
-                <span className="booking-detail-val emerald">100% Free Refund (Active)</span>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="booking-actions-row">
-              <button onClick={() => alert('Downloading E-Ticket Pass...')} className="btn-booking-download">
-                <Download size={16} />
-                <span>Download Boarding PDF</span>
-              </button>
-
-              <button onClick={() => alert('Change seat request sent to operator.')} className="btn-booking-reschedule">
-                <RefreshCw size={16} />
-                <span>Reschedule / Change Seat</span>
-              </button>
-
-              <button onClick={() => alert('Cancellation initiated. Full refund will process within 5 minutes.')} className="btn-booking-cancel">
-                <XCircle size={16} />
-                <span>Cancel Ticket (Instant Refund)</span>
-              </button>
-            </div>
-
-          </div>
-
         </div>
       )}
 

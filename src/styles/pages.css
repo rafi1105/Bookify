@@ -2458,3 +2458,120 @@
     transform: translateY(0);
   }
 }
+.bookify-stack {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.bookify-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: 1rem;
+}
+
+.bookify-panel {
+  padding: 1.15rem;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  background: var(--bg-card);
+  overflow-wrap: anywhere;
+}
+
+.bookify-form {
+  display: grid;
+  align-content: start;
+  gap: 0.8rem;
+}
+
+.bookify-form label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.bookify-form input,
+.bookify-form select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.6rem;
+  background: var(--bg-card);
+  color: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: 0.45rem;
+}
+
+.bookify-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.bookify-panel button,
+.bookify-actions button {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.45rem;
+  background: var(--bg-card);
+  color: inherit;
+  cursor: pointer;
+}
+
+.bookify-panel button:hover:not(:disabled),
+.bookify-actions button:hover:not(:disabled) {
+  border-color: var(--cyan-primary);
+}
+
+.bookify-panel button:disabled,
+.bookify-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.bookify-coach-image {
+  width: 100%;
+  max-height: 12rem;
+  object-fit: cover;
+  border-radius: 0.55rem;
+}
+
+.bookify-seats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.bookify-seats.bookify-ac {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bookify-seats.bookify-sleeper {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bookify-seats button[aria-pressed="true"] {
+  background: var(--cyan-primary);
+  color: var(--text-inverse);
+}
+
+@media print {
+  body:has(.bookify-print-ticket) * {
+    visibility: hidden;
+  }
+
+  body .bookify-print-ticket,
+  body .bookify-print-ticket * {
+    visibility: visible;
+  }
+
+  body .bookify-print-ticket {
+    position: absolute;
+    inset: 0 auto auto 0;
+    color: #000;
+    background: #fff;
+  }
+
+  body .bookify-print-ticket button {
+    display: none;
+  }
+}

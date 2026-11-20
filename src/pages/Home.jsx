@@ -80,7 +80,7 @@ export default function Home() {
 
             {/* Subtitle */}
             <p className="hero-fade hero-subtitle">
-              Book luxury express double-decker coaches with interactive seat maps, live satellite GPS tracking, 4K entertainment pods, and 100% instant refunds.
+              Find intercity coaches, choose a seat or berth, and manage your e-ticket from My Bookings.
             </p>
           </div>
 

@@ -23,6 +23,7 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
+    { name: 'Demo Login', path: '/workspace' },
     { name: 'Home', path: '/' },
     { name: 'Search Routes', path: '/search' },
     { name: 'Luxury Fleet', path: '/fleet' },

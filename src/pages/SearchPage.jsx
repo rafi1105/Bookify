@@ -1,237 +1,137 @@
-import React, { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, ShieldCheck, Bus, X } from 'lucide-react';
-
+import React, { useEffect, useState } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import SearchWidget from '../components/SearchWidget';
-import BusCard from '../components/BusCard';
-import SeatPicker from '../components/SeatPicker';
-import TicketModal from '../components/TicketModal';
-import { MOCK_BUSES } from '../data/mockData';
+import { api, dhakaTime, money } from '../lib/bookifyApi';
 
-export default function SearchPage() {
-  const [searchParams] = useSearchParams();
-  const from = searchParams.get('from') || 'Dhaka';
-  const to = searchParams.get('to') || 'Chattogram';
+function Reservation({ trip }) {
+  const [layout, setLayout] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const [selectedBusId, setSelectedBusId] = useState(null);
-  const [activeBookingDetails, setActiveBookingDetails] = useState(null);
-
-  // Filters State
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [maxPrice, setMaxPrice] = useState(2500);
-  const [sortBy, setSortBy] = useState('departure');
-
-  // Selected Bus Object
-  const selectedBus = MOCK_BUSES.find((b) => b.id === selectedBusId);
-
-  // Filter Buses
-  const filteredBuses = MOCK_BUSES.filter((bus) => {
-    // If specific route query is provided and has matches in our fleet, show matching routes
-    const hasRouteMatch = MOCK_BUSES.some(
-      (b) => b.from.toLowerCase() === from.toLowerCase() && b.to.toLowerCase() === to.toLowerCase()
-    );
-    if (hasRouteMatch) {
-      if (bus.from.toLowerCase() !== from.toLowerCase() || bus.to.toLowerCase() !== to.toLowerCase()) {
-        return false;
-      }
+  useEffect(() => {
+    let active = true;
+    function refresh() {
+      api('/trips/' + trip.id + '/seats').then((data) => {
+        if (!active) return;
+        setLayout(data);
+        setSelected((current) => current.filter((seat) => data.some((item) => item.seat === seat && item.available)));
+      }).catch((problem) => { if (active) setError(problem.message); });
     }
-    if (selectedCategory === 'sleeper' && !bus.busType.toLowerCase().includes('sleeper')) return false;
-    if (selectedCategory === 'seater' && !bus.busType.toLowerCase().includes('seater')) return false;
-    if (bus.price > maxPrice) return false;
-    return true;
-  }).sort((a, b) => {
-    if (sortBy === 'price') return a.price - b.price;
-    if (sortBy === 'rating') return b.rating - a.rating;
-    return a.departureTime.localeCompare(b.departureTime);
-  });
+    refresh();
+    const interval = setInterval(refresh, 12000);
+    window.addEventListener('focus', refresh);
+    return () => { active = false; clearInterval(interval); window.removeEventListener('focus', refresh); };
+  }, [trip.id]);
 
-  const handleSelectSeats = (bus) => {
-    if (selectedBusId === bus.id) {
-      setSelectedBusId(null);
-    } else {
-      setSelectedBusId(bus.id);
+  async function checkout(event) {
+    event.preventDefault();
+    setBusy(true);
+    setError('');
+    const form = Object.fromEntries(new FormData(event.currentTarget));
+    try {
+      const { user } = await api('/session');
+      if (user?.role !== 'passenger') await api('/session', { role: 'passenger' });
+      const { url } = await api('/checkout', { ...form, trip: trip.id, seats: selected });
+      window.location.assign(url);
+    } catch (problem) {
+      setError(problem.message);
+      setBusy(false);
     }
-  };
-
-  const handleBookingComplete = (bookingDetails) => {
-    setActiveBookingDetails(bookingDetails);
-    setSelectedBusId(null);
-  };
+  }
 
   return (
+    <form className="bookify-panel bookify-form" onSubmit={checkout}>
+      <h2>{trip.coach === 'Sleeper' ? 'Choose berths' : 'Choose seats'}</h2>
+      <div className={'bookify-seats ' + (trip.coach === 'Sleeper' ? 'bookify-sleeper' : trip.coach === 'AC' ? 'bookify-ac' : '')}>
+        {layout.map(({ seat, available }) => (
+          <button key={seat} type="button" aria-pressed={selected.includes(seat)}
+            disabled={!available || busy || (selected.length >= 6 && !selected.includes(seat))}
+            onClick={() => setSelected((current) => current.includes(seat) ? current.filter((item) => item !== seat) : [...current, seat])}>
+            {seat}
+          </button>
+        ))}
+      </div>
+      <label>Passenger name<input name="passenger" maxLength={100} required /></label>
+      <label>Demo email<input name="contact" type="email" maxLength={150} placeholder="passenger@example.com" required /></label>
+      {error && <p role="alert">{error}</p>}
+      <button className="booking-lookup-btn" disabled={!selected.length || busy}>
+        {busy ? 'Opening Stripe…' : 'Pay ' + money(trip.fare * selected.length) + ' with Stripe (test)'}
+      </button>
+      <p>Seats are held for 10 minutes when checkout starts.</p>
+    </form>
+  );
+}
+
+export default function SearchPage() {
+  const [params] = useSearchParams();
+  const [trips, setTrips] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [coachOverride, setCoach] = useState(null);
+  const coach = coachOverride ?? ({ sleeper: 'Sleeper', executive: 'AC' }[params.get('class')] || '');
+  const [sort, setSort] = useState('time');
+  const from = params.get('from') || '';
+  const to = params.get('to') || '';
+  const date = params.get('date') || '';
+  const period = params.get('time');
+
+  useEffect(() => {
+    const query = new URLSearchParams();
+    for (const [key, data] of Object.entries({ from, to, date, coach })) if (data) query.set(key, data);
+    let active = true;
+    setLoading(true);
+    setError('');
+    setSelected(null);
+    api('/trips?' + query).then((data) => { if (active) setTrips(data); })
+      .catch((problem) => { if (active) setError(problem.message); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [from, to, date, coach]);
+
+  const startHour = { morning: 6, afternoon: 12, evening: 18 }[period];
+  const visible = trips.filter((trip) => {
+    if (startHour === undefined) return true;
+    const hour = (new Date(trip.departure).getUTCHours() + 6) % 24;
+    return hour >= startHour && hour < startHour + 6;
+  });
+  if (sort === 'price') visible.sort((a, b) => a.fare - b.fare);
+  return (
     <div className="page-container search-page full-width-screen">
-      
-      {/* Search Header Widget */}
       <div className="search-header-container">
-        <div className="search-header-top">
-          <div className="search-header-title-block">
-            <h1 className="search-page-title">Bus Search Results</h1>
-            <p className="search-page-subtitle">
-              Showing available luxury coaches from <span className="search-highlight">{from}</span> to <span className="search-highlight">{to}</span>
-            </p>
-          </div>
-          <div className="search-guarantee-pill">
-            <ShieldCheck size={16} />
-            <span>Guaranteed Seat Availability</span>
-          </div>
-        </div>
-
-        <SearchWidget compact={true} initialFrom={from} initialTo={to} />
+        <h1 className="search-page-title">Bus search results</h1>
+        <SearchWidget compact key={from + to + date} initialFrom={from} initialTo={to} initialDate={date || undefined} />
       </div>
-
-      {/* Main 3-Column Desktop Grid: Left Filters | Center Bus Cards | Right Seat Picker & Checkout */}
       <div className="search-layout-grid">
-        
-        {/* Column 1: Left Filters Sidebar */}
-        <aside className="search-filters-sidebar">
-          
-          <div className="filters-header">
-            <div className="filters-title-group">
-              <SlidersHorizontal size={16} className="highlight-cyan" />
-              <span>Filter Results</span>
-            </div>
-            <button
-              onClick={() => {
-                setSelectedCategory('all');
-                setMaxPrice(2500);
-                setSortBy('departure');
-              }}
-              className="filters-reset-btn"
-            >
-              Reset
-            </button>
-          </div>
-
-          {/* Sort By */}
-          <div className="filter-group">
-            <label className="filter-label">Sort By</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="filter-select"
-            >
-              <option value="departure">Departure Time (Earliest)</option>
-              <option value="price">Lowest Fare First</option>
-              <option value="rating">Top Passenger Rating</option>
-            </select>
-          </div>
-
-          {/* Bus Category */}
-          <div className="filter-group">
-            <label className="filter-label">Bus Class</label>
-            <div className="filter-category-buttons">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`filter-btn ${selectedCategory === 'all' ? 'active' : ''}`}
-              >
-                All Bus Classes
-              </button>
-              <button
-                onClick={() => setSelectedCategory('sleeper')}
-                className={`filter-btn ${selectedCategory === 'sleeper' ? 'active' : ''}`}
-              >
-                Pod-Sleeper Only
-              </button>
-              <button
-                onClick={() => setSelectedCategory('seater')}
-                className={`filter-btn ${selectedCategory === 'seater' ? 'active' : ''}`}
-              >
-                VIP Executive Seater
-              </button>
-            </div>
-          </div>
-
-          {/* Max Price Slider */}
-          <div className="filter-price-slider">
-            <div className="filter-price-row">
-              <span className="filter-label">Max Price</span>
-              <span className="highlight-cyan">৳{maxPrice.toLocaleString()}</span>
-            </div>
-            <input
-              type="range"
-              min="800"
-              max="3000"
-              step="50"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="filter-range-slider"
-            />
-          </div>
-
-          {/* Amenities */}
-          <div className="filter-amenities-group">
-            <label className="filter-label">Included Amenities</label>
-            <div className="filter-amenities-list">
-              <label className="filter-checkbox-label">
-                <input type="checkbox" defaultChecked className="filter-checkbox" />
-                <span>Wi-Fi 6 Ultra Fast</span>
-              </label>
-              <label className="filter-checkbox-label">
-                <input type="checkbox" defaultChecked className="filter-checkbox" />
-                <span>Personal Reading Pod Light</span>
-              </label>
-              <label className="filter-checkbox-label">
-                <input type="checkbox" defaultChecked className="filter-checkbox" />
-                <span>Satellite Live GPS Feed</span>
-              </label>
-            </div>
-          </div>
-
+        <aside className="search-filters-sidebar bookify-form">
+          <label>Coach class<select value={coach} onChange={(event) => setCoach(event.target.value)}>
+            <option value="">All classes</option><option>AC</option><option>Non-AC</option><option>Sleeper</option>
+          </select></label>
+          <label>Sort by<select value={sort} onChange={(event) => setSort(event.target.value)}>
+            <option value="time">Earliest departure</option><option value="price">Lowest fare</option>
+          </select></label>
+          <Link to="/workspace">Vendor and admin demo</Link>
         </aside>
-
-        {/* Column 2: Center Bus Results List */}
-        <div className="search-results-col">
-          
-          <div className="search-results-info">
-            <span>Found <strong>{filteredBuses.length}</strong> matching luxury buses</span>
-            <span className="highlight-cyan">• Live Telematics Included</span>
-          </div>
-
-          {filteredBuses.map((bus) => (
-            <div key={bus.id} className="search-bus-item">
-              <BusCard
-                bus={bus}
-                isSelected={selectedBusId === bus.id}
-                onSelectSeats={handleSelectSeats}
-              />
-            </div>
+        <section className="bookify-stack" aria-label="Departures">
+          {loading && <p role="status">Loading departures…</p>}
+          {error && <p role="alert">{error}</p>}
+          {!loading && !error && visible.length === 0 && <p>No matching departures. <Link to="/search">Show all trips</Link></p>}
+          {!loading && !error && visible.map((trip) => (
+            <article className="bus-card-container bookify-panel" key={trip.id}>
+              {trip.image && <img className="bookify-coach-image" src={trip.image} alt="" loading="lazy" />}
+              <h2>{trip.bus_name}</h2><p>{trip.vendor} · {trip.coach}</p>
+              <p>{trip.origin} → {trip.destination}</p>
+              <p>{dhakaTime(trip.departure)} → {dhakaTime(trip.arrival)}</p>
+              <p>Board at {trip.boarding} · Drop off at {trip.dropping}</p>
+              <button className="bus-select-seats-btn" onClick={() => setSelected(selected?.id === trip.id ? null : trip)}>
+                {selected?.id === trip.id ? 'Close seat picker' : 'Choose seats · ' + money(trip.fare)}
+              </button>
+            </article>
           ))}
-
-        </div>
-
-        {/* Column 3: Right Sidebar Panel (Seat Selection & Passenger Information) */}
-        <aside className="search-right-checkout-panel">
-          {selectedBus ? (
-            <div className="relative">
-              <SeatPicker
-                bus={selectedBus}
-                onComplete={handleBookingComplete}
-                onClose={() => setSelectedBusId(null)}
-              />
-            </div>
-          ) : (
-            <div className="search-right-empty-card">
-              <div className="search-empty-icon-box">
-                <Bus size={28} className="highlight-cyan" />
-              </div>
-              <h4 className="search-empty-title">Select Your Seat Layout</h4>
-              <p className="search-empty-desc">
-                Click <strong>Select Seat Layout</strong> on any luxury coach to interactively view the seat map and enter passenger information.
-              </p>
-            </div>
-          )}
-        </aside>
-
+        </section>
+        <aside>{selected && <Reservation key={selected.id} trip={selected} />}</aside>
       </div>
-
-      {/* Confetti Boarding Ticket Modal */}
-      {activeBookingDetails && (
-        <TicketModal
-          bookingDetails={activeBookingDetails}
-          onClose={() => setActiveBookingDetails(null)}
-        />
-      )}
-
     </div>
   );
 }

@@ -18,7 +18,7 @@ export default function ContactPage() {
     },
     {
       q: "Where do I track the real-time live GPS location of my bus?",
-      a: "You can track your bus live on the 'My Bookings' page or via the SMS link sent to your phone 1 hour before departure. Our satellite telemetry updates every 3 seconds."
+      a: "Open the simulated bus tracker from My Bookings to see demo trip progress and sample delays."
     },
     {
       q: "Are luggage fees included in the ticket price?",
