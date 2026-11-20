@@ -1,130 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowRightLeft, Search, Sparkles } from 'lucide-react';
-import CitySelect from './CitySelect';
-import CustomDatePicker from './CustomDatePicker';
+import { ArrowRightLeft, Search } from 'lucide-react';
+import { CITY_OPTIONS } from './CitySelect';
 
-export default function SearchWidget({ compact = false, initialFrom = '', initialTo = '', initialDate = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Dhaka' }).format(new Date()) }) {
+const dhakaDate = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Dhaka' }).format(new Date());
+
+export default function SearchWidget({
+  compact = false, initialFrom = '', initialTo = '', initialDate = '', initialClass = 'all', initialTime = 'all',
+}) {
   const { push: navigate } = useRouter();
-  const [fromCity, setFromCity] = useState(initialFrom || 'Dhaka');
-  const [toCity, setToCity] = useState(initialTo || 'Chattogram');
-  const [date, setDate] = useState(initialDate || new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Dhaka' }).format(new Date()));
-  const [busClass, setBusClass] = useState('all');
-  const [timeSlot, setTimeSlot] = useState('all');
-  const [isSwapping, setIsSwapping] = useState(false);
+  const cities = useId();
+  const [from, setFrom] = useState(initialFrom || 'Dhaka');
+  const [to, setTo] = useState(initialTo || 'Chattogram');
+  const [date, setDate] = useState(initialDate || dhakaDate());
+  const [coach, setCoach] = useState(initialClass);
+  const [time, setTime] = useState(initialTime);
+  const [error, setError] = useState('');
 
-  const handleSwap = () => {
-    setIsSwapping(true);
-    setTimeout(() => {
-      const temp = fromCity;
-      setFromCity(toCity);
-      setToCity(temp);
-      setIsSwapping(false);
-    }, 200);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    navigate(
-      `/search?from=${encodeURIComponent(fromCity)}&to=${encodeURIComponent(toCity)}&date=${date}&class=${busClass}&time=${timeSlot}`
-    );
-  };
+  function submit(event) {
+    event.preventDefault();
+    if (!from.trim() || !to.trim() || from.trim().toLowerCase() === to.trim().toLowerCase()) {
+      setError('Choose a different departure and destination city.');
+      return;
+    }
+    setError('');
+    navigate('/search?' + new URLSearchParams({ from: from.trim(), to: to.trim(), date, class: coach, time }));
+  }
 
   return (
-    <div className={`search-widget-card ${compact ? 'compact' : ''}`}>
-      
-      {!compact && (
-        <div className="search-widget-header">
-          <div className="search-widget-header-title-row">
-            <div className="search-widget-title-block">
-              <h3 className="search-widget-title">Find & Book Your Luxury Bus</h3>
-              <p className="search-widget-subtitle">Search approved intercity departures and compare fares.</p>
-            </div>
-          </div>
-
-          <div className="search-class-pills">
-            <button
-              type="button"
-              onClick={() => setBusClass('all')}
-              className={`search-class-pill-btn ${busClass === 'all' ? 'active-all' : ''}`}
-            >
-              All Coaches
-            </button>
-            <button
-              type="button"
-              onClick={() => setBusClass('sleeper')}
-              className={`search-class-pill-btn ${busClass === 'sleeper' ? 'active-sleeper' : ''}`}
-            >
-              <Sparkles size={13} />
-              Sleeper Pods
-            </button>
-            <button
-              type="button"
-              onClick={() => setBusClass('executive')}
-              className={`search-class-pill-btn ${busClass === 'executive' ? 'active-executive' : ''}`}
-            >
-              VIP Seater
-            </button>
-          </div>
-        </div>
-      )}
-
-      <form onSubmit={handleSearch} className="search-widget-form-grid">
-        
-        {/* Origin Custom Dropdown */}
-        <div className="search-grid-cell">
-          <CitySelect
-            label="Departure Station"
-            value={fromCity}
-            onChange={setFromCity}
-            iconType="origin"
-            excludeCity={toCity}
-          />
-        </div>
-
-        {/* Swap Button */}
-        <div className="search-grid-swap-cell">
-          <button
-            type="button"
-            onClick={handleSwap}
-            title="Swap departure and destination"
-            className={`btn-swap-locations ${isSwapping ? 'swapping' : ''}`}
-          >
-            <ArrowRightLeft size={16} />
-          </button>
-        </div>
-
-        {/* Destination Custom Dropdown */}
-        <div className="search-grid-cell">
-          <CitySelect
-            label="Destination Station"
-            value={toCity}
-            onChange={setToCity}
-            iconType="dest"
-            excludeCity={fromCity}
-          />
-        </div>
-
-        {/* Date & Time Picker */}
-        <div className="search-grid-cell date-cell">
-          <CustomDatePicker
-            label="Travel Date & Window"
-            value={date}
-            onChange={setDate}
-            timeSlot={timeSlot}
-            onTimeSlotChange={setTimeSlot}
-          />
-        </div>
-
-        {/* Search CTA */}
-        <div className="search-grid-cta-cell">
-          <button type="submit" className="primary-btn-liquid">
-            <Search size={18} />
-            <span>Search</span>
-          </button>
-        </div>
-
-      </form>
-    </div>
+    <form className={'booking-search-form' + (compact ? ' booking-search-compact' : '')} onSubmit={submit}>
+      <div className="booking-search-fields">
+        <datalist id={cities}>{CITY_OPTIONS.map(({ city }) => <option key={city} value={city} />)}</datalist>
+        <label>From<input list={cities} value={from} onChange={(event) => setFrom(event.target.value)} maxLength={100} required /></label>
+        <button className="booking-swap" type="button" aria-label="Swap departure and destination" onClick={() => { setFrom(to); setTo(from); }}>
+          <ArrowRightLeft size={18} />
+        </button>
+        <label>To<input list={cities} value={to} onChange={(event) => setTo(event.target.value)} maxLength={100} required /></label>
+        <label>Travel date<input type="date" value={date} min={dhakaDate()} onChange={(event) => setDate(event.target.value)} required /></label>
+        <button className="booking-primary" type="submit"><Search size={18} /> Search buses</button>
+      </div>
+      <div className="booking-search-options">
+        <label>Coach class<select value={coach} onChange={(event) => setCoach(event.target.value)}>
+          <option value="all">Any class</option><option value="executive">AC</option><option value="non-ac">Non-AC</option><option value="sleeper">Sleeper</option>
+        </select></label>
+        <label>Departure time<select value={time} onChange={(event) => setTime(event.target.value)}>
+          <option value="all">Any time</option><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option>
+        </select></label>
+      </div>
+      {error && <p role="alert">{error}</p>}
+    </form>
   );
 }

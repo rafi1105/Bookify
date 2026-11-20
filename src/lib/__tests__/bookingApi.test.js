@@ -24,6 +24,17 @@ test('Express validates Stripe signatures and enforces signed demo roles', async
   assert.equal((await fetch(base + '/api/workspace', { headers: { cookie } })).status, 403);
   assert.equal((await (await fetch(base + '/api/session', { headers: { cookie: cookie + 'A' } })).json()).user, null);
   assert.equal((await send('/api/session', { role: 'admin' }, { 'Sec-Fetch-Site': 'cross-site' })).status, 403);
+  assert.equal((await send('/api/session', { role: 'admin' }, { cookie })).status, 409);
+  const logout = await fetch(base + '/api/session', {
+    method: 'DELETE', headers: { 'Content-Type': 'application/json', cookie }, body: '{}',
+  });
+  assert.equal(logout.status, 200);
+  assert.match(logout.headers.get('set-cookie'), /Expires=/);
+  const vendor = await send('/api/session', { role: 'vendor', vendor: 'Demo Transit' });
+  assert.equal((await vendor.json()).user.vendor, 'Demo Transit');
+  const admin = await send('/api/session', { role: 'admin' });
+  assert.equal((await admin.json()).user.role, 'admin');
+
   const event = { id: 'evt_test', type: 'other.event', data: { object: {} } };
   assert.equal((await send('/api/stripe/webhook', event, { 'Stripe-Signature': 'invalid' })).status, 400);
   const signature = new Stripe('sk_test_fixture').webhooks.generateTestHeaderString({

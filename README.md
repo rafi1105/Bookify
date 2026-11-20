@@ -12,10 +12,10 @@ Bookify is a three-role bus e-ticketing demo built with Next.js, React, external
 
 ## Walk through the demo
 
-1. Open /workspace, choose a vendor, register a coach and submit a route and fare.
-2. Switch to Admin, enter the approved duration and approve the request.
-3. Switch to the original vendor and publish a future departure. Daily repeats are optional. Schedules use Dhaka time.
-4. Open /search, select a trip and choose seats. Use a fictional name and test email. Pay in Stripe test mode, then wait for the signed webhook to confirm the booking in My Bookings. Use Print / Save PDF for the e-ticket.
+1. Choose Sign in, then Vendor. Select a demo vendor, register a coach, and submit a route and fare.
+2. Sign out, choose Admin, enter the approved duration, and approve the request.
+3. Sign out, choose the original vendor, and publish a future departure. Daily repeats are optional. Schedules use Dhaka time.
+4. Sign out, select Passenger, and open /search to choose a trip and seats. Use a fictional name and test email. Pay in Stripe test mode, then wait for the signed webhook to confirm the booking in My Bookings. Use Print / Save PDF for the e-ticket.
 5. Review the manifest and sales totals under the vendor and Admin dashboards. Within the passenger session you can cancel a future ticket, then observe its refund state. Demo passenger bookings are tied to the browser session.
 
 A seat hold expires after 10 minutes. Stripe Checkout can stay open longer. A verified late payment goes into the refund workflow when the seat hold is gone.

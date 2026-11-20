@@ -148,8 +148,8 @@ app.post('/api/session', (req, res) => {
   if (!['passenger', 'vendor', 'admin'].includes(role) || (role === 'vendor' && !vendors.includes(vendor))) {
     failure(400, 'Choose an available demo role');
   }
-  const existing = session(req);
-  const passengerId = existing?.passengerId || randomUUID();
+  if (session(req)) failure(409, 'Sign out before choosing another role');
+  const passengerId = randomUUID();
   const user = { role, vendor: role === 'vendor' ? vendor : null, passengerId,
     id: role === 'passenger' ? passengerId : randomUUID(),
     expiry: Date.now() + 86400000 };

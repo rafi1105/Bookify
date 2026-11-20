@@ -1,3 +1,4 @@
+import { useDemoSession } from '../context/DemoSessionContext';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, dhakaTime, money } from '../lib/bookifyApi';
@@ -179,23 +180,21 @@ function Reports({ data, user, busy, update }) {
 }
 
 export default function WorkspacePage() {
-  const [session, setSession] = useState(null);
+  const { user, ready, openLogin } = useDemoSession();
   const [data, setData] = useState(null);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     let active = true;
-    api('/session').then(async (details) => {
-      if (!active) return;
-      setSession(details);
-      if (['admin', 'vendor'].includes(details.user?.role)) {
-        const workspace = await api('/workspace');
-        if (active) setData(workspace);
-      }
-    }).catch((problem) => { if (active) setError(problem.message); });
+    setData(null);
+    setError('');
+    setNotice('');
+    if (!['admin', 'vendor'].includes(user?.role)) return undefined;
+    api('/workspace').then((workspace) => { if (active) setData(workspace); })
+      .catch((problem) => { if (active) setError(problem.message); });
     return () => { active = false; };
-  }, []);
+  }, [user]);
 
   async function update(path, body, form) {
     setBusy(true);
@@ -214,36 +213,37 @@ export default function WorkspacePage() {
           body.image = upload.url;
         }
       }
-      const response = await api(path, body);
-      if (path === '/session') {
-        setData(null);
-        setSession((current) => ({ ...current, user: response.user }));
-        if (response.user.role === 'passenger') return;
-      }
+      await api(path, body);
       setData(await api('/workspace'));
-      if (path !== '/session') { form?.reset(); setNotice('Changes saved.'); }
+      form?.reset();
+      setNotice('Changes saved.');
     } catch (problem) { setError(problem.message); }
     finally { setBusy(false); }
   }
 
-  const user = session?.user;
-  return <section className="page-container bookify-stack">
-    <header className="page-header">
-      <h1 className="page-title">{user?.role === 'admin' ? 'Admin dashboard' : user?.role === 'vendor' ? user.vendor : 'Bookify demo login'}</h1>
-      <p className="page-subtitle">Switch between demo roles using synthetic data.</p>
+  const staff = user?.role === 'admin' || user?.role === 'vendor';
+  return <section className="page-container bookify-stack site-workspace">
+    <header className="site-workspace-heading">
+      <h1>{user?.role === 'admin' ? 'Admin dashboard' : user?.role === 'vendor' ? user.vendor : 'Bookify workspace'}</h1>
+      {staff && <p>Manage fleet, route approvals, and scheduled departures.</p>}
     </header>
-    <nav className="bookify-actions" aria-label="Demo login">
-      <button disabled={busy} onClick={() => update('/session', { role: 'passenger' })}>Passenger login</button>
-      {session?.vendors.map((vendor) => (
-        <button disabled={busy} key={vendor} onClick={() => update('/session', { role: 'vendor', vendor })}>{vendor} login</button>
-      ))}
-      <button disabled={busy} onClick={() => update('/session', { role: 'admin' })}>Admin login</button>
-      <Link href="/search">Search trips</Link><Link href="/my-bookings">My bookings</Link>
-    </nav>
-    {error && <p role="alert">{error}</p>}
+    {!ready && <p role="status">Checking your session…</p>}
+    {ready && !user && <div className="bookify-panel bookify-stack">
+      <p>Choose Vendor or Admin to open a demo dashboard.</p>
+      <button type="button" className="site-primary" onClick={() => openLogin()}>Choose a demo role</button>
+    </div>}
+    {user?.role === 'passenger' && <div className="bookify-panel bookify-stack">
+      <p>Sign out to open a Vendor or Admin dashboard.</p>
+      <Link href="/my-bookings">My bookings</Link>
+    </div>}
+    {staff && !data && !error && <p role="status">Loading your dashboard…</p>}
+    {error && <div className="bookify-panel bookify-stack" role="alert">
+      <h2>{data ? 'Could not save changes' : 'Dashboard data unavailable'}</h2>
+      <p>{error === 'Supabase is not configured' ? 'The demo database has not been connected to this deployment.' : error}</p>
+    </div>}
     {notice && <p role="status">{notice}</p>}
-    {data && user?.role === 'vendor' && <VendorForms data={data} update={update} busy={busy} />}
-    {data && user && <>
+    {staff && data && user?.role === 'vendor' && <VendorForms data={data} update={update} busy={busy} />}
+    {staff && data && <>
       <Proposals data={data} admin={user.role === 'admin'} busy={busy} update={update} />
       <Fleet data={data} admin={user.role === 'admin'} busy={busy} update={update} />
       <Reports data={data} user={user} busy={busy} update={update} />

@@ -210,3 +210,7 @@ All services expose standards-compliant REST endpoints secured via Bearer JWT an
 The v1 demo uses /api/trips, /api/session, /api/workspace, /api/checkout, /api/bookings and /api/stripe/webhook as described in [the hosted demo contract](../sdd/sdd-06-hosted-demo.md).
 
 POST /api/bookings/:id/resume returns { url } for the authenticated passenger's existing open checkout, 404 for an unknown or unowned booking, and 409 when checkout cannot be resumed.
+
+### Demo session switching
+
+GET /api/session returns the current demo identity and vendor choices. POST /api/session creates a session for a signed-out visitor and returns 409 when a session already exists. DELETE /api/session clears it. API paths still use the current server session for authorization.

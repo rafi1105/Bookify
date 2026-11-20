@@ -23,7 +23,7 @@ export default function FleetPage() {
           Engineered For Superior Comfort & Safety
         </h1>
         <p className="page-subtitle">
-          Bookify operates and partners exclusively with top-tier multi-axle luxury coaches featuring European safety air-brakes, air suspension, and ergonomic sleeper pods.
+          Explore examples of the coach layouts available in Bookify. Search departures for actual availability and fares.
         </p>
       </div>
 
@@ -77,7 +77,7 @@ export default function FleetPage() {
                     href="/search"
                     className="fleet-book-btn"
                   >
-                    <span>Book On This Bus</span>
+                    <span>Find departures</span>
                     <ArrowRight size={16} />
                   </Link>
                 </div>

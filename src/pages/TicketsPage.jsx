@@ -1,3 +1,4 @@
+import { useDemoSession } from '../context/DemoSessionContext';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,16 +10,14 @@ export default function TicketsPage() {
   const router = useRouter();
   const query = new URLSearchParams(router.asPath.split("?")[1]?.split("#")[0] || "");
   const payment = query.get('payment');
-  const [user, setUser] = useState(undefined);
+  const { user, ready, openLogin } = useDemoSession();
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    api('/session').then((data) => setUser(data.user)).catch((problem) => { setError(problem.message); setUser(null); });
-  }, []);
-
-  useEffect(() => {
+    setOrders([]);
+    setError('');
     if (user?.role !== 'passenger') return undefined;
     let active = true;
     function refresh() {
@@ -36,7 +35,6 @@ export default function TicketsPage() {
     try {
       const data = await api(path, body);
       if (data.url) window.location.assign(data.url);
-      else if (path === '/session') setUser(data.user);
       else setOrders(await api('/bookings'));
     } catch (problem) { setError(problem.message); }
     finally { setBusy(false); }
@@ -51,11 +49,12 @@ export default function TicketsPage() {
       {error && <p role="alert">{error}</p>}
       {payment === 'processing' && <p role="status">Stripe payment status updates below after verification.</p>}
       {payment === 'cancelled' && <p>You left Stripe Checkout. You can resume payment before your seat hold expires.</p>}
-      {user === undefined && <p>Loading session…</p>}
-      {user !== undefined && user?.role !== 'passenger' && (
-        <button className="booking-lookup-btn" disabled={busy} onClick={() => act('/session', { role: 'passenger' })}>Passenger demo login</button>
+      {!ready && <p>Loading session…</p>}
+      {ready && !user && (
+        <button className="booking-lookup-btn" disabled={busy} onClick={() => openLogin({ role: 'passenger' })}>Sign in as passenger</button>
       )}
-      {user?.role === 'passenger' && !orders.length && <p>Your tickets appear here after checkout.</p>}
+      {ready && user && user.role !== 'passenger' && <p>Sign out from the header to open a passenger session.</p>}
+      {user?.role === 'passenger' && !orders.length && !error && <p>Your tickets appear here after checkout.</p>}
       {user?.role === 'passenger' && orders.map((order) => {
         const trip = order.bookify_trips;
         const expired = order.state === 'held' && Date.parse(order.expires) <= Date.now();

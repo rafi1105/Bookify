@@ -1,3 +1,4 @@
+import { useDemoSession } from '../context/DemoSessionContext';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -5,6 +6,8 @@ import SearchWidget from '../components/SearchWidget';
 import { api, dhakaTime, money } from '../lib/bookifyApi';
 
 function Reservation({ trip }) {
+  const { user, ready, openLogin } = useDemoSession();
+  const { asPath } = useRouter();
   const [layout, setLayout] = useState([]);
   const [selected, setSelected] = useState([]);
   const [error, setError] = useState('');
@@ -27,12 +30,18 @@ function Reservation({ trip }) {
 
   async function checkout(event) {
     event.preventDefault();
+    if (!user) {
+      openLogin({ role: 'passenger', destination: asPath });
+      return;
+    }
+    if (user.role !== 'passenger') {
+      setError('Sign out to book as a passenger.');
+      return;
+    }
     setBusy(true);
     setError('');
     const form = Object.fromEntries(new FormData(event.currentTarget));
     try {
-      const { user } = await api('/session');
-      if (user?.role !== 'passenger') await api('/session', { role: 'passenger' });
       const { url } = await api('/checkout', { ...form, trip: trip.id, seats: selected });
       window.location.assign(url);
     } catch (problem) {
@@ -57,8 +66,8 @@ function Reservation({ trip }) {
       <label>Demo email<input name="contact" type="email" maxLength={150} placeholder="passenger@example.com" required /></label>
       {error && <p role="alert">{error}</p>}
       <p>Cancel before {dhakaTime(trip.departure)} (Dhaka time) for {selected.length ? money(trip.fare * selected.length) + ' back' : 'a full refund'}. Passenger cancellations close at departure.</p>
-      <button className="booking-lookup-btn" disabled={!selected.length || busy}>
-        {busy ? 'Opening Stripe…' : 'Pay ' + money(trip.fare * selected.length) + ' with Stripe (test)'}
+      <button className="booking-lookup-btn" disabled={!selected.length || busy || !ready}>
+        {busy ? 'Opening Stripe…' : !user ? 'Sign in to book' : 'Pay ' + money(trip.fare * selected.length) + ' with Stripe (test)'}
       </button>
       <p>Seats are held for 10 minutes when checkout starts.</p>
     </form>
@@ -73,7 +82,7 @@ export default function SearchPage({ today }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [coachOverride, setCoach] = useState(null);
-  const coach = coachOverride ?? ({ sleeper: 'Sleeper', executive: 'AC' }[params.get('class')] || '');
+  const coach = coachOverride ?? ({ sleeper: 'Sleeper', executive: 'AC', 'non-ac': 'Non-AC' }[params.get('class')] || '');
   const [sort, setSort] = useState('time');
   const from = params.get('from') || '';
   const to = params.get('to') || '';
@@ -104,7 +113,7 @@ export default function SearchPage({ today }) {
     <div className="page-container search-page full-width-screen">
       <div className="search-header-container">
         <h1 className="search-page-title">Bus search results</h1>
-        <SearchWidget compact key={from + to + date} initialFrom={from} initialTo={to} initialDate={date || today} />
+        <SearchWidget compact key={params.toString()} initialFrom={from} initialTo={to} initialDate={date || today} initialClass={params.get('class') || 'all'} initialTime={period || 'all'} />
       </div>
       <div className="search-layout-grid">
         <aside className="search-filters-sidebar bookify-form">
@@ -114,7 +123,6 @@ export default function SearchPage({ today }) {
           <label>Sort by<select value={sort} onChange={(event) => setSort(event.target.value)}>
             <option value="time">Earliest departure</option><option value="price">Lowest fare</option>
           </select></label>
-          <Link href="/workspace">Vendor and admin demo</Link>
         </aside>
         <section className="bookify-stack" aria-label="Departures">
           {loading && <p role="status">Loading departures…</p>}
