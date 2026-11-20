@@ -2,7 +2,7 @@ import express from 'express';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
-import { departureInstant, paidCheckout, seatLayout } from './domain.js';
+import { departureInstant, paidCheckout, resumableCheckout, seatLayout } from './domain.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -220,6 +220,19 @@ app.get('/api/bookings', async (req, res) => {
   const user = requireRole(req, 'passenger');
   res.json(await read(table(database(), 'orders').select(orderFields).eq('customer', user.id)
     .order('created_at', { ascending: false }).limit(100)));
+});
+
+app.post('/api/bookings/:id/resume', async (req, res) => {
+  const user = requireRole(req, 'passenger');
+  const order = await read(table(database(), 'orders').select('id,state,expires,stripe_session')
+    .eq('id', uuid(req.params.id)).eq('customer', user.id).maybeSingle());
+  if (!order) failure(404, 'Booking not found');
+  if (order.state !== 'held' || !order.stripe_session || Date.parse(order.expires) <= Date.now()) {
+    failure(409, 'This seat hold is no longer available for payment');
+  }
+  const checkout = await stripeClient().checkout.sessions.retrieve(order.stripe_session);
+  if (!resumableCheckout(order, checkout)) failure(409, 'This checkout is closed. Check your booking status.');
+  res.json({ url: checkout.url });
 });
 
 app.post('/api/bookings/:id/cancel', async (req, res) => {

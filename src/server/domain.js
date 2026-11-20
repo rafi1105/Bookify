@@ -20,3 +20,9 @@ export function departureInstant(value) {
   }
   return new Date(+local - 6 * 3600000).toISOString();
 }
+
+export function resumableCheckout(order, checkout, now = Date.now()) {
+  return order.state === 'held' && Date.parse(order.expires) > now &&
+    checkout.id === order.stripe_session && checkout.metadata?.booking === order.id &&
+    checkout.status === 'open' && checkout.payment_status === 'unpaid' && Boolean(checkout.url);
+}

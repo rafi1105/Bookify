@@ -33,7 +33,8 @@ export default function TicketsPage() {
     setError('');
     try {
       const data = await api(path, body);
-      if (path === '/session') setUser(data.user);
+      if (data.url) window.location.assign(data.url);
+      else if (path === '/session') setUser(data.user);
       else setOrders(await api('/bookings'));
     } catch (problem) { setError(problem.message); }
     finally { setBusy(false); }
@@ -47,7 +48,7 @@ export default function TicketsPage() {
       </div>
       {error && <p role="alert">{error}</p>}
       {payment === 'processing' && <p role="status">Stripe payment status updates below after verification.</p>}
-      {payment === 'cancelled' && <p>Checkout closed. Any unused seat hold expires automatically.</p>}
+      {payment === 'cancelled' && <p>You left Stripe Checkout. You can resume payment before your seat hold expires.</p>}
       {user === undefined && <p>Loading session…</p>}
       {user !== undefined && user?.role !== 'passenger' && (
         <button className="booking-lookup-btn" disabled={busy} onClick={() => act('/session', { role: 'passenger' })}>Passenger demo login</button>
@@ -68,6 +69,12 @@ export default function TicketsPage() {
             <p>{order.passenger} · Seats {order.seats.join(', ')} · {money(order.total)}</p>
             {activeTicket && <p>Ticket reference <strong>{order.id}</strong></p>}
             <div className="bookify-actions">
+              {order.state === 'held' && !expired && (
+                <button type="button" disabled={busy} onClick={() => act('/bookings/' + order.id + '/resume', {})}>
+                  Resume Stripe payment
+                </button>
+              )}
+              {expired && <Link to="/search">Find another departure</Link>}
               {activeTicket && <button type="button" onClick={(event) => {
                 const ticket = event.currentTarget.closest('.bookify-ticket');
                 ticket.classList.add('bookify-print-ticket');

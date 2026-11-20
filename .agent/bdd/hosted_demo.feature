@@ -8,3 +8,8 @@ Feature: Bookify Stripe demo
     Given an expired seat hold
     When Stripe reports a successful payment
     Then the system refunds the payment without issuing a ticket
+
+  Scenario: Resume interrupted checkout
+    Given a passenger owns a booking with an active seat hold and an open Stripe session
+    When the passenger resumes payment from My Bookings
+    Then Stripe opens the same checkout session
