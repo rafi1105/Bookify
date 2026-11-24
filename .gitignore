@@ -33,3 +33,6 @@ dist-ssr
 # Next.js build output
 .next/
 out/
+
+supabase/.temp/
+
