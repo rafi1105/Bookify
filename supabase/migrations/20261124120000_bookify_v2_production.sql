@@ -332,7 +332,8 @@ alter table public.buses alter column code set not null;
 create unique index if not exists bk_buses_code on public.buses (code);
 alter table public.buses drop constraint if exists bk_bus_image_url;
 alter table public.buses add constraint bk_bus_image_url
-  check (image_url is null or image_url ~ '^https?://[^\s]{4,480}$') not valid;
+  -- (Postgres regex repetition is capped at 255, so the length is checked separately)
+  check (image_url is null or (char_length(image_url) <= 500 and image_url ~ '^https?://[^[:space:]]+$')) not valid;
 
 -- status: ACTIVE (vendor says it can be used), OFF_DUTY (vendor takes it out), SUSPENDED (admin)
 alter table public.buses drop constraint if exists bk_bus_status;
@@ -419,7 +420,16 @@ alter table public.trips
   add column if not exists arrival_at timestamptz,
   add column if not exists fare numeric(10,2),
   add column if not exists cancel_reason text,
-  add column if not exists cancelled_at timestamptz;
+  add column if not exists cancelled_at timestamptz,
+  -- Delays: dep_delay_min pushes the whole trip later (the bus was still on its previous trip);
+  -- traffic_delay_min is time lost in traffic on this trip. jam_started_at / jam_prior_min describe
+  -- the stoppages so the bus position can be derived. All times here are simulation times.
+  add column if not exists dep_delay_min int not null default 0 check (dep_delay_min >= 0),
+  add column if not exists traffic_delay_min int not null default 0 check (traffic_delay_min >= 0),
+  add column if not exists jam_prior_min int not null default 0 check (jam_prior_min >= 0),
+  add column if not exists jam_started_at timestamptz,
+  add column if not exists delay_cause text check (delay_cause in ('TRAFFIC', 'PREVIOUS_TRIP')),
+  add column if not exists delay_note text;
 
 create index if not exists bk_trips_route_departure on public.trips (route_id, departure_at);
 create index if not exists bk_trips_bus_departure on public.trips (bus_id, departure_at);
@@ -500,7 +510,7 @@ begin
   foreach t in array array['roles','users','vendors','bus_operators','bus_capacities','buses','drivers','routes',
     'route_stops','trip_schedules','trips','bookings','booking_items','passengers','coupons','payments','invoices',
     'wallet','wallet_transactions','reviews','ai_logs','demand_forecasts','ai_recommendations','seat_locks',
-    'route_permissions','audit_logs','bus_status_events'] loop
+    'route_permissions','audit_logs','bus_status_events','sim_clock'] loop
     -- legacy tables (drivers, wallet, ai_logs, ...) may or may not exist
     continue when to_regclass(format('public.%I', t)) is null;
     execute format('alter table public.%I enable row level security', t);
@@ -550,10 +560,61 @@ returns int language sql immutable set search_path = '' as $$
 $$;
 
 -- Trips are sellable until 30 minutes before departure.
+-- -------------------------------------------------------------------------------------
+-- Simulation clock. Fleet movement (trip start, finish, bus position, delays) runs on this
+-- clock, which can run faster than real time (speed 60 = one real second is one minute).
+-- Seat holds, payments and other ticketing timestamps stay on real time.
+-- -------------------------------------------------------------------------------------
+create table if not exists public.sim_clock (
+  id boolean primary key default true check (id),
+  speed numeric not null default 1 check (speed >= 1 and speed <= 600),
+  real_anchor timestamptz not null default now(),
+  sim_anchor timestamptz not null default now()
+);
+insert into public.sim_clock (id) values (true) on conflict do nothing;
+-- Created after the security block above, so it is locked down here: server only.
+alter table public.sim_clock enable row level security;
+revoke all on public.sim_clock from anon, authenticated;
+grant select, insert, update, delete on public.sim_clock to service_role;
+
+create or replace function public.bk_now()
+returns timestamptz language sql stable set search_path = '' as $$
+  select c.sim_anchor + (now() - c.real_anchor) * c.speed::float8 from public.sim_clock c
+$$;
+
+-- Change the speed (continuing from the current simulated time) or reset to real time.
+create or replace function public.bk_set_sim(p_speed numeric, p_reset boolean default false)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  c public.sim_clock;
+begin
+  if p_speed is not null and (p_speed < 1 or p_speed > 600) then
+    perform public.bk_fail('BK400', 'Speed must be between 1 and 600');
+  end if;
+  if p_reset then
+    update public.sim_clock set real_anchor = now(), sim_anchor = now(), speed = coalesce(p_speed, speed) where id;
+  else
+    update public.sim_clock set sim_anchor = public.bk_now(), real_anchor = now(), speed = coalesce(p_speed, speed) where id;
+  end if;
+  select * into c from public.sim_clock;
+  return jsonb_build_object('speed', c.speed, 'real_anchor', c.real_anchor, 'sim_anchor', c.sim_anchor, 'now', now());
+end
+$$;
+
+-- Expected departure and arrival, including delays.
+create or replace function public.bk_trip_dep(t public.trips)
+returns timestamptz language sql stable set search_path = '' as $$
+  select t.departure_at + make_interval(mins => t.dep_delay_min)
+$$;
+create or replace function public.bk_trip_arr(t public.trips)
+returns timestamptz language sql stable set search_path = '' as $$
+  select t.arrival_at + make_interval(mins => t.dep_delay_min + t.traffic_delay_min)
+$$;
+
 create or replace function public.bk_trip_sellable(trip public.trips)
 returns boolean language sql stable set search_path = '' as $$
   select trip.status in ('SCHEDULED', 'DELAYED')
-    and trip.departure_at > now() + interval '30 minutes'
+    and public.bk_trip_dep(trip) > public.bk_now() + interval '30 minutes'
     and exists (select 1 from public.vendors v where v.id = trip.vendor_id
                 and v.status = 'ACTIVE')
     and exists (select 1 from public.buses b where b.id = trip.bus_id and b.status = 'ACTIVE')
@@ -572,14 +633,16 @@ end
 $$;
 
 -- Search ------------------------------------------------------------------------------
+drop function if exists public.bk_search_trips(text, text, date);
 create or replace function public.bk_search_trips(p_from text, p_to text, p_date date)
 returns table (
   trip_id uuid, departure_at timestamptz, arrival_at timestamptz, fare numeric, bus_type bus_type_enum,
   bus_name text, amenities text[], operator_name text, vendor_id uuid, route_id uuid, origin text,
   destination text, duration_min int, total_seats int, available_seats int, seat_kind text,
-  rating numeric, rating_count int, boarding_points text[], dropping_points text[], image_url text, bus_code text
+  rating numeric, rating_count int, boarding_points text[], dropping_points text[], image_url text, bus_code text,
+  scheduled_departure_at timestamptz, delay_min int, delay_cause text
 ) language sql stable security definer set search_path = '' as $$
-  select t.id, t.departure_at, t.arrival_at, t.fare, b.bus_type, coalesce(b.name, b.model_no), b.amenities,
+  select t.id, public.bk_trip_dep(t), public.bk_trip_arr(t), t.fare, b.bus_type, coalesce(b.name, b.model_no), b.amenities,
     o.operator_name, t.vendor_id, r.id, r.start_point, r.end_point,
     (extract(epoch from t.arrival_at - t.departure_at) / 60)::int,
     cardinality(public.bk_layout_seats(c.seat_layout_json)),
@@ -592,7 +655,7 @@ returns table (
           and s.stop_type in ('BOARDING', 'BOTH') order by s.sequence_order),
     array(select s.stop_name from public.route_stops s where s.permission_id = t.permission_id
           and s.stop_type in ('DROPPING', 'BOTH') order by s.sequence_order),
-    b.image_url, b.code
+    b.image_url, b.code, t.departure_at, t.dep_delay_min + t.traffic_delay_min, t.delay_cause
   from public.trips t
   join public.routes r on r.id = t.route_id
   join public.buses b on b.id = t.bus_id
@@ -607,7 +670,7 @@ returns table (
     and r.status = 'ACTIVE'
     and (t.departure_at at time zone 'Asia/Dhaka')::date = p_date
     and public.bk_trip_sellable(t)
-  order by t.departure_at
+  order by public.bk_trip_dep(t)
 $$;
 
 create or replace function public.bk_cities()
@@ -651,7 +714,8 @@ begin
 
   select jsonb_build_object(
     'trip', jsonb_build_object(
-      'id', t.id, 'departure_at', t.departure_at, 'arrival_at', t.arrival_at, 'fare', t.fare,
+      'id', t.id, 'departure_at', public.bk_trip_dep(t), 'arrival_at', public.bk_trip_arr(t), 'fare', t.fare,
+      'scheduled_departure_at', t.departure_at, 'delay_min', t.dep_delay_min + t.traffic_delay_min, 'delay_cause', t.delay_cause, 'delay_note', t.delay_note,
       'status', t.status, 'sellable', public.bk_trip_sellable(t),
       'origin', r.start_point, 'destination', r.end_point, 'route_id', r.id,
       'bus_name', coalesce(b.name, b.model_no), 'bus_code', b.code, 'image_url', b.image_url, 'bus_type', b.bus_type, 'amenities', b.amenities,
@@ -659,7 +723,7 @@ begin
     'layout', c.seat_layout_json,
     'stops', coalesce((select jsonb_agg(jsonb_build_object(
         'id', s.id, 'name', s.stop_name, 'address', s.address, 'type', s.stop_type,
-        'sequence', s.sequence_order, 'time', t.departure_at + make_interval(mins => s.travel_time_min))
+        'sequence', s.sequence_order, 'time', public.bk_trip_dep(t) + make_interval(mins => s.travel_time_min))
         order by s.sequence_order) from public.route_stops s where s.permission_id = t.permission_id), '[]'),
     'booked', coalesce((select jsonb_agg(bi.seat_number) from public.booking_items bi
         where bi.trip_id = t.id and bi.status = 'CONFIRMED'), '[]'),
@@ -867,10 +931,10 @@ begin
     webhook_data_json = p_payload, updated_at = now() where id = pay.id;
 
   if bk.status = 'PENDING_PAYMENT' and bk.expires_at > now() and t.status in ('SCHEDULED', 'DELAYED')
-     and t.departure_at > now() then
+     and public.bk_trip_dep(t) > public.bk_now() then
     update public.booking_items set status = 'CONFIRMED' where booking_id = bk.id and status = 'HELD';
     outcome := 'CONFIRMED';
-  elsif t.status in ('SCHEDULED', 'DELAYED') and t.departure_at > now() then
+  elsif t.status in ('SCHEDULED', 'DELAYED') and public.bk_trip_dep(t) > public.bk_now() then
     -- Paid after the hold lapsed: confirm only if every seat is still free.
     begin
       update public.booking_items set status = 'CONFIRMED' where booking_id = bk.id;
@@ -916,7 +980,7 @@ begin
   if not found then perform public.bk_fail('BK404', 'Booking not found'); end if;
   if bk.status <> 'CONFIRMED' then perform public.bk_fail('BK409', 'Only confirmed tickets can be cancelled'); end if;
   select * into t from public.trips where id = bk.trip_id;
-  hours_left := extract(epoch from t.departure_at - now()) / 3600;
+  hours_left := extract(epoch from public.bk_trip_dep(t) - public.bk_now()) / 3600;
   percent := public.bk_refund_percent(hours_left);
   if percent = 0 then
     perform public.bk_fail('BK409', 'Tickets can no longer be cancelled less than 12 hours before departure');
@@ -1041,9 +1105,9 @@ begin
     if extract(dow from d)::smallint = any(p_days) then
       starts := (d + p_departure) at time zone 'Asia/Dhaka';
       finish := starts + make_interval(mins => perm.approved_duration_min);
-      if starts > now() + interval '1 hour' then
+      if starts > public.bk_now() + interval '1 hour' then
         if exists (select 1 from public.trips x where x.bus_id = b.id and x.status <> 'CANCELLED'
-                   and x.departure_at < finish and x.arrival_at > starts) then
+                   and public.bk_trip_dep(x) < finish and public.bk_trip_arr(x) > starts) then
           perform public.bk_fail('BK409', 'Bus ' || b.code || ' is still on another trip around '
             || to_char(starts at time zone 'Asia/Dhaka', 'DD Mon YYYY HH24:MI'));
         end if;
@@ -1061,11 +1125,14 @@ end
 $$;
 
 -- Bus availability and condition (vendor for own buses; admin with p_vendor null) -------
+drop function if exists public.bk_set_bus_state(uuid, uuid, uuid, text, text, text);
 create or replace function public.bk_set_bus_state(p_actor uuid, p_vendor uuid, p_bus uuid,
-  p_status text, p_condition text, p_note text)
+  p_status text, p_condition text, p_note text, p_delay int default null)
 returns public.buses language plpgsql security definer set search_path = '' as $$
 declare
   b public.buses;
+  cur public.trips;
+  prior int;
 begin
   select * into b from public.buses where id = p_bus for update;
   if not found or (p_vendor is not null and b.vendor_id <> p_vendor) then
@@ -1080,23 +1147,76 @@ begin
       perform public.bk_fail('BK403', 'This bus was suspended by an administrator');
     end if;
     if p_status <> 'ACTIVE' and exists (select 1 from public.trips t where t.bus_id = b.id and t.status <> 'CANCELLED'
-                                         and t.arrival_at > now()) then
+                                         and public.bk_trip_arr(t) > public.bk_now()) then
       perform public.bk_fail('BK409', 'This bus has trips that are running or on sale. Cancel those trips first');
     end if;
     update public.buses set status = p_status where id = b.id;
     insert into public.bus_status_events (bus_id, actor_id, kind, value, note) values (b.id, p_actor, 'STATUS', p_status, nullif(trim(p_note), ''));
   end if;
 
-  if p_condition is not null and p_condition <> b.condition then
-    if p_condition not in ('NORMAL', 'IN_TRAFFIC', 'ACCIDENT', 'BREAKDOWN') then
-      perform public.bk_fail('BK400', 'Unknown bus condition');
+  if p_delay is not null and (p_delay < 5 or p_delay > 720) then
+    perform public.bk_fail('BK400', 'Give the expected traffic delay in minutes, between 5 and 720');
+  end if;
+  if p_condition is not null and p_condition not in ('NORMAL', 'IN_TRAFFIC', 'ACCIDENT', 'BREAKDOWN') then
+    perform public.bk_fail('BK400', 'Unknown bus condition');
+  end if;
+
+  -- A traffic jam with an expected delay holds the running trip still for that long and
+  -- pushes its arrival, and every later trip of this bus, back by the same amount.
+  if p_condition = 'IN_TRAFFIC' and p_delay is not null then
+    select t.* into cur from public.trips t where t.bus_id = b.id and t.status = 'EN_ROUTE'
+      order by t.departure_at limit 1 for update;
+    if not found then
+      perform public.bk_fail('BK409', 'This bus is not on a trip right now, so a traffic delay cannot be recorded');
     end if;
-    update public.buses set condition = p_condition, condition_note = nullif(trim(p_note), ''), condition_updated_at = now() where id = b.id;
-    insert into public.bus_status_events (bus_id, actor_id, kind, value, note) values (b.id, p_actor, 'CONDITION', p_condition, nullif(trim(p_note), ''));
+    prior := cur.jam_prior_min + case when cur.jam_started_at is null then 0 else
+      round(least(greatest(extract(epoch from public.bk_now() - cur.jam_started_at) / 60, 0), cur.traffic_delay_min - cur.jam_prior_min))::int end;
+    update public.trips set jam_prior_min = prior, traffic_delay_min = prior + p_delay, jam_started_at = public.bk_now(),
+      delay_cause = 'TRAFFIC', delay_note = nullif(trim(p_note), '') where id = cur.id;
+    perform public.bk_recompute_bus_delays(b.id);
+  elsif p_condition = 'NORMAL' and b.condition = 'IN_TRAFFIC' then
+    -- The jam cleared early: only the time already lost counts.
+    update public.trips set traffic_delay_min = jam_prior_min + round(least(greatest(
+        extract(epoch from public.bk_now() - jam_started_at) / 60, 0), traffic_delay_min - jam_prior_min))::int
+    where bus_id = b.id and status = 'EN_ROUTE' and jam_started_at is not null and traffic_delay_min > jam_prior_min
+      and public.bk_now() < jam_started_at + make_interval(mins => traffic_delay_min - jam_prior_min);
+    perform public.bk_recompute_bus_delays(b.id);
+  end if;
+
+  if p_condition is not null and (p_condition <> b.condition or p_delay is not null) then
+    update public.buses set condition = p_condition, condition_note = nullif(trim(p_note), ''), condition_updated_at = public.bk_now() where id = b.id;
+    insert into public.bus_status_events (bus_id, actor_id, kind, value, note)
+    values (b.id, p_actor, 'CONDITION', p_condition,
+      nullif(trim(concat_ws(' · ', case when p_delay is not null then 'Expected delay ' || p_delay || ' min' end, nullif(trim(p_note), ''))), ''));
   end if;
 
   select * into b from public.buses where id = p_bus;
   return b;
+end
+$$;
+
+-- Delay cascade: walk a bus's unfinished trips in order. A trip cannot leave before the bus
+-- has arrived from the one before, so it is pushed back (status DELAYED) by the overlap.
+create or replace function public.bk_recompute_bus_delays(p_bus uuid)
+returns void language plpgsql security definer set search_path = '' as $$
+declare
+  r public.trips;
+  prev_arr timestamptz;
+  dd int;
+begin
+  for r in select * from public.trips where bus_id = p_bus and status <> 'CANCELLED' order by departure_at loop
+    if r.status in ('SCHEDULED', 'BOARDING', 'DELAYED') then
+      dd := case when prev_arr is not null and prev_arr > r.departure_at
+                 then ceil(extract(epoch from prev_arr - r.departure_at) / 60)::int else 0 end;
+      update public.trips set dep_delay_min = dd,
+        status = case when dd > 0 then 'DELAYED'::public.trip_status_enum else 'SCHEDULED'::public.trip_status_enum end,
+        delay_cause = case when dd > 0 then 'PREVIOUS_TRIP' else null end
+      where id = r.id and (dep_delay_min is distinct from dd or (status = 'DELAYED') <> (dd > 0));
+      prev_arr := r.arrival_at + make_interval(mins => dd + r.traffic_delay_min);
+    else
+      prev_arr := r.arrival_at + make_interval(mins => r.dep_delay_min + r.traffic_delay_min);
+    end if;
+  end loop;
 end
 $$;
 
@@ -1112,24 +1232,40 @@ returns jsonb language sql stable security definer set search_path = '' as $$
         when b.status = 'SUSPENDED' then 'SUSPENDED'
         when b.status <> 'ACTIVE' then 'OFF_DUTY'
         when b.condition in ('ACCIDENT', 'BREAKDOWN') then b.condition
-        when cur.id is not null and b.condition = 'IN_TRAFFIC' then 'IN_TRAFFIC'
+        when cur.id is not null and (jam.active or (b.condition = 'IN_TRAFFIC' and cur.traffic_delay_min = 0)) then 'IN_TRAFFIC'
         when cur.id is not null then 'ON_TRIP'
         else 'AVAILABLE' end,
       'current_trip', case when cur.id is null then null else jsonb_build_object(
-        'id', cur.id, 'origin', cr.start_point, 'destination', cr.end_point, 'departure_at', cur.departure_at, 'arrival_at', cur.arrival_at,
-        'progress', round(least(100, greatest(0, 100 * extract(epoch from now() - cur.departure_at)
+        'id', cur.id, 'origin', cr.start_point, 'destination', cr.end_point,
+        'departure_at', public.bk_trip_dep(cur), 'scheduled_departure_at', cur.departure_at,
+        'arrival_at', public.bk_trip_arr(cur), 'scheduled_arrival_at', cur.arrival_at,
+        'duration_min', round(extract(epoch from cur.arrival_at - cur.departure_at) / 60),
+        'dep_delay_min', cur.dep_delay_min, 'traffic_delay_min', cur.traffic_delay_min, 'jam_prior_min', cur.jam_prior_min,
+        'jam_started_at', cur.jam_started_at, 'jam_active', jam.active, 'delay_cause', cur.delay_cause, 'delay_note', cur.delay_note,
+        'stops', coalesce((select jsonb_agg(jsonb_build_object('name', st.stop_name, 'minutes', st.travel_time_min) order by st.travel_time_min)
+                           from public.route_stops st where st.permission_id = cur.permission_id and st.travel_time_min > 0
+                             and st.travel_time_min < extract(epoch from cur.arrival_at - cur.departure_at) / 60), '[]'::jsonb),
+        'progress', round(least(100, greatest(0, 100 * (extract(epoch from public.bk_now() - public.bk_trip_dep(cur)) - jam.stopped)
                           / nullif(extract(epoch from cur.arrival_at - cur.departure_at), 0)))::numeric, 1)) end,
       'next_trip', case when nxt.id is null then null else jsonb_build_object(
-        'id', nxt.id, 'origin', nr.start_point, 'destination', nr.end_point, 'departure_at', nxt.departure_at) end,
-      'free_at', cur.arrival_at
+        'id', nxt.id, 'origin', nr.start_point, 'destination', nr.end_point,
+        'departure_at', public.bk_trip_dep(nxt), 'scheduled_departure_at', nxt.departure_at,
+        'dep_delay_min', nxt.dep_delay_min, 'delay_cause', nxt.delay_cause,
+        'waiting_for_bus', cur.id is not null and nxt.delay_cause = 'PREVIOUS_TRIP') end,
+      'free_at', case when cur.id is null then null else public.bk_trip_arr(cur) end
     ) as row
     from public.buses b
     join public.bus_operators o on o.id = b.operator_id
     left join lateral (select t.* from public.trips t where t.bus_id = b.id and t.status <> 'CANCELLED'
-      and t.departure_at <= now() and t.arrival_at > now() order by t.departure_at limit 1) cur on true
+      and public.bk_trip_dep(t) <= public.bk_now() and public.bk_trip_arr(t) > public.bk_now() order by t.departure_at limit 1) cur on true
+    left join lateral (select
+        coalesce(cur.jam_prior_min, 0) + coalesce(least(greatest(extract(epoch from public.bk_now() - cur.jam_started_at) / 60, 0),
+          cur.traffic_delay_min - cur.jam_prior_min), 0) as stopped_min) jm on true
+    left join lateral (select jm.stopped_min * 60 as stopped,
+        (cur.jam_started_at is not null and public.bk_now() < cur.jam_started_at + make_interval(mins => cur.traffic_delay_min - cur.jam_prior_min)) as active) jam on true
     left join public.routes cr on cr.id = cur.route_id
-    left join lateral (select t.* from public.trips t where t.bus_id = b.id and t.status <> 'CANCELLED'
-      and t.departure_at > now() order by t.departure_at limit 1) nxt on true
+    left join lateral (select t.* from public.trips t where t.bus_id = b.id and t.status not in ('CANCELLED', 'COMPLETED')
+      and public.bk_trip_dep(t) > public.bk_now() order by public.bk_trip_dep(t) limit 1) nxt on true
     left join public.routes nr on nr.id = nxt.route_id
     where p_vendor is null or b.vendor_id = p_vendor
   ) x
@@ -1146,7 +1282,7 @@ begin
   if not found or (p_vendor is not null and t.vendor_id <> p_vendor) then
     perform public.bk_fail('BK404', 'Trip not found');
   end if;
-  if t.status in ('CANCELLED', 'COMPLETED') or t.departure_at <= now() then
+  if t.status in ('CANCELLED', 'COMPLETED') or public.bk_trip_dep(t) <= public.bk_now() then
     perform public.bk_fail('BK409', 'Only upcoming trips can be cancelled');
   end if;
   if length(trim(coalesce(p_reason, ''))) < 5 then
@@ -1225,6 +1361,62 @@ returns jsonb language sql stable security definer set search_path = '' as $$
         from trips_in ti join public.routes r on r.id = ti.route_id left join sold s on s.trip_id = ti.id
         group by r.start_point, r.end_point) x), '[]')
   )
+$$;
+
+-- -------------------------------------------------------------------------------------
+-- Automatic trip status: SCHEDULED -> EN_ROUTE at departure, -> COMPLETED at arrival.
+-- The playground also derives status from the clock when it reads, so the screens are right
+-- even if this job is late. Run every minute by pg_cron where available (see below),
+-- and by /api/cron/sync-trips or any page that reads the fleet.
+-- -------------------------------------------------------------------------------------
+create or replace function public.bk_sync_trip_status()
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  finished int;
+  started int;
+  cleared int;
+  r record;
+begin
+  update public.trips t set status = 'COMPLETED'
+  where t.status in ('SCHEDULED', 'BOARDING', 'EN_ROUTE', 'DELAYED') and public.bk_trip_arr(t) <= public.bk_now();
+  get diagnostics finished = row_count;
+
+  -- Push later trips of delayed buses back before deciding what has started.
+  for r in select distinct bus_id from public.trips
+           where status in ('SCHEDULED', 'BOARDING', 'DELAYED', 'EN_ROUTE') and (dep_delay_min > 0 or traffic_delay_min > 0) loop
+    perform public.bk_recompute_bus_delays(r.bus_id);
+  end loop;
+
+  update public.trips t set status = 'EN_ROUTE'
+  where t.status in ('SCHEDULED', 'BOARDING', 'DELAYED')
+    and public.bk_trip_dep(t) <= public.bk_now() and public.bk_trip_arr(t) > public.bk_now();
+  get diagnostics started = row_count;
+
+  -- A traffic jam with a set delay ends by itself when that time has passed.
+  with ended as (
+    update public.buses bu set condition = 'NORMAL', condition_note = null, condition_updated_at = public.bk_now()
+    where bu.condition = 'IN_TRAFFIC' and exists (
+      select 1 from public.trips t where t.bus_id = bu.id and t.jam_started_at = bu.condition_updated_at
+        and t.traffic_delay_min > t.jam_prior_min
+        and t.jam_started_at + make_interval(mins => t.traffic_delay_min - t.jam_prior_min) <= public.bk_now())
+    returning bu.id)
+  insert into public.bus_status_events (bus_id, kind, value, note) select id, 'CONDITION', 'NORMAL', 'Traffic cleared' from ended;
+  get diagnostics cleared = row_count;
+
+  return jsonb_build_object('started', started, 'completed', finished, 'traffic_cleared', cleared, 'sim_now', public.bk_now());
+end
+$$;
+
+-- Once a minute, if the pg_cron extension can be enabled (Supabase: Database > Extensions).
+-- Without it the app still syncs on every fleet read and through /api/cron/sync-trips.
+do $$
+begin
+  create extension if not exists pg_cron;
+  perform cron.unschedule(jobid) from cron.job where jobname = 'bookify-trip-status';
+  perform cron.schedule('bookify-trip-status', '* * * * *', 'select public.bk_sync_trip_status()');
+exception when others then
+  raise notice 'pg_cron not enabled (%): trips are still synced whenever the fleet is read', sqlerrm;
+end
 $$;
 
 -- -------------------------------------------------------------------------------------

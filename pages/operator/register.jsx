@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import AuthCard from '../../src/components/AuthCard.jsx';
-import { Alert, Button, Field } from '../../src/components/ui.jsx';
+import { Alert, Button, Field, PasswordInput } from '../../src/components/ui.jsx';
 import { api } from '../../src/lib/api.js';
 import { supabaseBrowser } from '../../src/lib/supabaseBrowser.js';
 
@@ -37,7 +37,7 @@ export default function RegisterOperator() {
       <form className="stack" onSubmit={submit}>
         <Field label="Company name" id="company"><input id="company" required className="input" autoComplete="organization" value={form.companyName} onChange={set('companyName')} /></Field>
         <Field label="E-mail" id="email"><input id="email" required type="email" className="input" autoComplete="email" value={form.email} onChange={set('email')} /></Field>
-        <Field label="Password" id="password" hint="At least 8 characters"><input id="password" required type="password" className="input" autoComplete="new-password" value={form.password} onChange={set('password')} /></Field>
+        <Field label="Password" id="password" hint="At least 8 characters"><PasswordInput id="password" required autoComplete="new-password" value={form.password} onChange={set('password')} /></Field>
         <Button type="submit" size="large" block loading={busy} disabled={!form.companyName || !form.email || form.password.length < 8}>Create operator account</Button>
       </form>
     </AuthCard>

@@ -1,3 +1,4 @@
+import DelayNotice from './DelayNotice.jsx';
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { ArrowRight, Bus, MapPin } from 'lucide-react';
@@ -23,6 +24,7 @@ export default function TicketView({ booking }) {
       </header>
       <div className="ticket-body">
         <div className="stack">
+          {valid && <DelayNotice scheduledDepartureAt={t.scheduledDepartureAt} departureAt={t.departureAt} delayMin={t.delayMin} />}
           <div className="ticket-route">{t.origin} <ArrowRight size={18} aria-hidden="true" /> {t.destination}</div>
           <div className="ticket-grid">
             <div><span className="muted small">Date</span><strong>{formatDate(t.departureAt)}</strong></div>

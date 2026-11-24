@@ -1,14 +1,17 @@
 import { db, unwrap } from './db.js';
 import { HttpError } from './http.js';
+import { paymentLabel } from './bookingList.js';
 
-const TRIP = 'id,status,departure_at,arrival_at,fare,vendor_id,routes(start_point,end_point),buses(name,model_no,reg_no,bus_type,amenities,bus_operators(operator_name))';
+const TRIP = 'id,status,departure_at,arrival_at,dep_delay_min,traffic_delay_min,delay_cause,delay_note,fare,vendor_id,routes(start_point,end_point),buses(name,model_no,reg_no,bus_type,amenities,bus_operators(operator_name))';
+
+const shift = (iso, mins) => new Date(new Date(iso).getTime() + mins * 60000).toISOString();
 
 function one(value) {
   return Array.isArray(value) ? value[0] : value;
 }
 
 // Normalised booking used by checkout, tickets and account pages.
-export async function loadBooking({ id, pnr, userId, phone }) {
+export async function loadBooking({ id, pnr, userId, phone, vendorId }) {
   let query = db().from('bookings').select('*');
   query = id ? query.eq('id', id) : query.eq('pnr', String(pnr || '').toUpperCase());
   const booking = unwrap(await query.maybeSingle());
@@ -21,13 +24,14 @@ export async function loadBooking({ id, pnr, userId, phone }) {
   const [trip, items, payment, stops] = await Promise.all([
     db().from('trips').select(TRIP).eq('id', booking.trip_id).single().then(unwrap),
     db().from('booking_items').select('seat_number,status,price,passengers(name,age,gender)').eq('booking_id', booking.id).order('seat_number').then(unwrap),
-    db().from('payments').select('status,payment_method,transaction_id,payment_time').eq('booking_id', booking.id).maybeSingle().then(unwrap),
+    db().from('payments').select('status,payment_method,transaction_id,payment_time,amount').eq('booking_id', booking.id).maybeSingle().then(unwrap),
     db().from('route_stops').select('id,stop_name,address,travel_time_min').in('id', [booking.boarding_stop_id, booking.dropping_stop_id].filter(Boolean)).then(unwrap),
   ]);
   const stop = (sid) => {
     const s = stops.find((x) => x.id === sid);
-    return s ? { name: s.stop_name, address: s.address, time: new Date(new Date(trip.departure_at).getTime() + s.travel_time_min * 60000).toISOString() } : null;
+    return s ? { name: s.stop_name, address: s.address, time: shift(trip.departure_at, trip.dep_delay_min + s.travel_time_min) } : null;
   };
+  if (vendorId && trip.vendor_id !== vendorId) throw new HttpError(404, 'Booking not found');
   const bus = one(trip.buses);
 
   const live = items.filter((i) => ['HELD', 'CONFIRMED'].includes(i.status));
@@ -42,6 +46,7 @@ export async function loadBooking({ id, pnr, userId, phone }) {
     id: booking.id,
     pnr: booking.pnr,
     status: booking.status,
+    paymentStatus: paymentLabel(booking, payment),
     total: Number(booking.total_amount),
     seatCount: booking.seat_count,
     expiresAt: booking.expires_at,
@@ -53,7 +58,9 @@ export async function loadBooking({ id, pnr, userId, phone }) {
     refundPercentNow: refundPercent,
     contact: { name: booking.contact_name, phone: booking.contact_phone, email: booking.contact_email },
     trip: {
-      id: trip.id, status: trip.status, departureAt: trip.departure_at, arrivalAt: trip.arrival_at, fare: Number(trip.fare),
+      id: trip.id, status: trip.status, scheduledDepartureAt: trip.departure_at,
+      departureAt: shift(trip.departure_at, trip.dep_delay_min), arrivalAt: shift(trip.arrival_at, trip.dep_delay_min + trip.traffic_delay_min),
+      delayMin: trip.dep_delay_min + trip.traffic_delay_min, delayCause: trip.delay_cause, delayNote: trip.delay_note, fare: Number(trip.fare),
       origin: one(trip.routes).start_point, destination: one(trip.routes).end_point,
       busName: bus.name || bus.model_no, regNo: bus.reg_no, busType: bus.bus_type,
       operator: one(bus.bus_operators).operator_name,
@@ -61,6 +68,6 @@ export async function loadBooking({ id, pnr, userId, phone }) {
     boarding: stop(booking.boarding_stop_id),
     dropping: stop(booking.dropping_stop_id),
     seats: shown.map((i) => ({ seat: i.seat_number, status: i.status, price: Number(i.price), passenger: one(i.passengers) || null })),
-    payment: payment ? { status: payment.status, method: payment.payment_method, transactionId: payment.transaction_id, paidAt: payment.payment_time } : null,
+    payment: payment ? { status: payment.status, method: payment.payment_method, transactionId: payment.transaction_id, paidAt: payment.payment_time, amount: Number(payment.amount) } : null,
   };
 }

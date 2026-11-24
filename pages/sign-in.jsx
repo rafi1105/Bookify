@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import AuthCard from '../src/components/AuthCard.jsx';
-import { Alert, Button, Field } from '../src/components/ui.jsx';
+import { Alert, Button, Field, PasswordInput } from '../src/components/ui.jsx';
 import { useAuth } from '../src/context/AuthContext.jsx';
 import { supabaseBrowser } from '../src/lib/supabaseBrowser.js';
 
@@ -54,7 +54,7 @@ export default function SignIn() {
             onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </Field>
         <Field label="Password" id="password">
-          <input id="password" className="input" type="password" autoComplete="current-password" required value={form.password}
+          <PasswordInput id="password" autoComplete="current-password" required value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })} />
         </Field>
         <Button type="submit" size="large" block loading={busy} disabled={!configured || !form.email || !form.password}>Sign in</Button>

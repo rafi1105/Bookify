@@ -23,5 +23,8 @@ export function unwrap({ data, error }) {
   if (error.code === '23503') throw new HttpError(400, 'A referenced record does not exist');
   if (error.code === '23514' || error.code === '22P02' || error.code === '22007') throw new HttpError(400, 'Check the values you entered');
   console.error('Database error', error.code, error.message);
-  throw new HttpError(503, 'The booking database could not complete the request');
+  // Specific, safe hint so a schema mismatch is diagnosable from the UI (full error is in the server log).
+  if (error.code === '42501') throw new HttpError(503, 'Database permission denied. Re-run the latest Bookify migration in the Supabase SQL editor and make sure SUPABASE_SERVICE_ROLE_KEY is the service_role key.');
+  if (error.code === '42P01' || error.code === '42703' || error.code === '42883' || error.code === 'PGRST202' || error.code === 'PGRST204' || error.code === 'PGRST205') throw new HttpError(503, `The database schema is out of date (${error.code}). Re-run the latest Bookify migration in the Supabase SQL editor.`);
+  throw new HttpError(503, `The booking database could not complete the request (${error.code || 'unknown'}: ${String(error.message).slice(0, 160)})`);
 }

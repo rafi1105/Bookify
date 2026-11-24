@@ -57,7 +57,7 @@ function TripCard({ trip }) {
         </div>
         <div className="trip-times">
           <div><strong className="time">{formatTime(trip.departure_at)}</strong><div className="muted small">{trip.origin}</div></div>
-          <div className="trip-line"><span className="small muted">{formatDuration(trip.duration_min)}</span></div>
+          <div className="trip-line"><span className="small muted">{formatDuration(trip.duration_min)}</span>{trip.delay_min > 0 && <span className="small delay-text">Delayed {formatDuration(trip.delay_min)} · was {formatTime(trip.scheduled_departure_at)}</span>}</div>
           <div><strong className="time">{formatTime(trip.arrival_at)}</strong><div className="muted small">{trip.destination}</div></div>
         </div>
         <div className="trip-buy">

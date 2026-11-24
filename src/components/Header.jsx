@@ -5,6 +5,7 @@ import { Bus, ChevronDown, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { ROLE_ADMIN, ROLE_VENDOR } from '../lib/roles.js';
 import ThemeToggle from './ThemeToggle.jsx';
+import { DhakaClock } from './Clock.jsx';
 
 const NAV = [
   { href: '/', label: 'Book a ticket' },
@@ -40,6 +41,7 @@ export default function Header() {
           {profile?.role_id === ROLE_ADMIN && <Link href="/admin" aria-current={active('/admin') ? 'page' : undefined}>Admin dashboard</Link>}
         </nav>
         <div className="header-actions">
+          <DhakaClock />
           <ThemeToggle />
           {loading ? null : session ? (
             <div className="user-menu">

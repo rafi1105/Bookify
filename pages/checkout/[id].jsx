@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import RequireAuth from '../../src/components/RequireAuth.jsx';
-import Countdown from '../../src/components/Countdown.jsx';
+import DelayNotice from '../../src/components/DelayNotice.jsx';
+import HoldBar from '../../src/components/HoldBar.jsx';
 import { Alert, Button, EmptyState, ErrorState, Field, PageHeader, Skeleton } from '../../src/components/ui.jsx';
 import { api } from '../../src/lib/api.js';
 import { COACH_LABEL, formatBDT, formatDate, formatTime } from '../../src/lib/format.js';
@@ -91,8 +92,9 @@ function Checkout({ id }) {
   return (
     <>
       <Head><title>Checkout · Bookify</title></Head>
-      <PageHeader title="Passenger details and payment" subtitle={`${t.origin} → ${t.destination} · ${formatDate(t.departureAt)}, ${formatTime(t.departureAt)}`}
-        actions={<span className="hold-timer">Seats held for <Countdown until={booking.expiresAt} onExpire={() => setExpired(true)} /></span>} />
+      <HoldBar seats={booking.seats.map((x) => x.seat)} until={booking.expiresAt} onExpire={() => setExpired(true)} />
+      <PageHeader title="Passenger details and payment" subtitle={`${t.origin} → ${t.destination} · ${formatDate(t.departureAt)}, ${formatTime(t.departureAt)}`} />
+      <div className="container"><DelayNotice scheduledDepartureAt={t.scheduledDepartureAt} departureAt={t.departureAt} delayMin={t.delayMin} /></div>
       <form className="container trip-layout" onSubmit={pay} noValidate>
         <div className="stack">
           <section className="card card-pad stack">

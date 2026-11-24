@@ -1,15 +1,16 @@
+import { Armchair, Banknote, CalendarClock, RotateCcw, TrendingUp } from 'lucide-react';
 import { Stat } from './ui.jsx';
 import { formatBDT } from '../lib/format.js';
 
 export default function ReportView({ data }) {
   return (
     <div className="stack">
-      <div className="grid-stats">
-        <Stat label="Trips run" value={data.trips} hint={`${data.cancelled_trips} cancelled`} />
-        <Stat label="Seats sold" value={data.seats_sold} hint={`of ${data.seats_offered} offered (${data.seats_offered ? Math.round((data.seats_sold / data.seats_offered) * 100) : 0}% occupancy)`} />
-        <Stat label="Collected" value={formatBDT(data.captured)} />
-        <Stat label="Refunded" value={formatBDT(data.refunded)} hint={`${formatBDT(data.refunds_pending)} pending`} />
-        <Stat label="Net" value={formatBDT(data.net)} />
+      <div className="kpi-row">
+        <Stat icon={CalendarClock} tone="info" label="Trips run" value={data.trips} hint={`${data.cancelled_trips} cancelled`} />
+        <Stat icon={Armchair} tone="brand" label="Seats sold" value={data.seats_sold} hint={`of ${data.seats_offered} offered (${data.seats_offered ? Math.round((data.seats_sold / data.seats_offered) * 100) : 0}% occupancy)`} />
+        <Stat icon={Banknote} tone="ok" label="Collected" value={formatBDT(data.captured)} />
+        <Stat icon={RotateCcw} tone="warn" label="Refunded" value={formatBDT(data.refunded)} hint={`${formatBDT(data.refunds_pending)} pending`} />
+        <Stat icon={TrendingUp} tone="brand" label="Net" value={formatBDT(data.net)} />
       </div>
       <div className="grid-two">
         <div className="card table-wrap"><table className="table"><caption className="table-caption">By route</caption>

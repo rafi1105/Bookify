@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import AuthCard from '../src/components/AuthCard.jsx';
-import { Alert, Button, Field } from '../src/components/ui.jsx';
+import { Alert, Button, Field, PasswordInput } from '../src/components/ui.jsx';
 import { useAuth } from '../src/context/AuthContext.jsx';
 import { supabaseBrowser } from '../src/lib/supabaseBrowser.js';
 
@@ -36,7 +36,7 @@ export default function ResetPassword() {
         <form className="stack" onSubmit={submit}>
           {error && <Alert kind="error">{error}</Alert>}
           <Field label="New password" id="password" hint="At least 8 characters">
-            <input id="password" className="input" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <PasswordInput id="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </Field>
           <Button type="submit" size="large" block loading={busy} disabled={loading}>Save password</Button>
         </form>

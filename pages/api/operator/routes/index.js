@@ -1,7 +1,7 @@
-import { route, text, int, money, HttpError } from '../../../src/server/http.js';
-import { requireVendor } from '../../../src/server/auth.js';
-import { db, unwrap } from '../../../src/server/db.js';
-import { COACH_CLASSES } from '../../../src/lib/classes.js';
+import { route, text, int, money, HttpError } from '../../../../src/server/http.js';
+import { requireVendor } from '../../../../src/server/auth.js';
+import { db, unwrap } from '../../../../src/server/db.js';
+import { COACH_CLASSES } from '../../../../src/lib/classes.js';
 
 function points(value, label) {
   const list = (Array.isArray(value) ? value : []).map((p) => String(p).trim()).filter(Boolean);

@@ -1,4 +1,5 @@
-import { AlertCircle, CheckCircle2, Info, Loader2, SearchX, TriangleAlert } from 'lucide-react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { AlertCircle, CheckCircle2, Eye, EyeOff, Info, Loader2, SearchX, TriangleAlert, X } from 'lucide-react';
 
 export function Button({ variant = 'primary', size, block, loading, children, className = '', ...rest }) {
   const classes = ['btn', `btn-${variant}`, size && `btn-${size}`, block && 'btn-block', className].filter(Boolean).join(' ');
@@ -16,6 +17,19 @@ export function Field({ label, hint, error, id, children }) {
       {label && <label htmlFor={id}>{label}</label>}
       {children}
       {error ? <span className="field-error" role="alert">{error}</span> : hint ? <span className="field-hint">{hint}</span> : null}
+    </div>
+  );
+}
+
+// Password input with a show/hide eye button.
+export function PasswordInput({ className = '', ...rest }) {
+  const [shown, setShown] = useState(false);
+  return (
+    <div className="input-wrap">
+      <input {...rest} className={`input input-has-action ${className}`.trim()} type={shown ? 'text' : 'password'} />
+      <button type="button" className="input-action" onClick={() => setShown((v) => !v)} aria-label={shown ? 'Hide password' : 'Show password'} aria-pressed={shown}>
+        {shown ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+      </button>
     </div>
   );
 }
@@ -88,21 +102,87 @@ export function PageHeader({ title, subtitle, actions }) {
   );
 }
 
-export function Modal({ title, onClose, children }) {
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// Dialog with a fixed header, a body that scrolls on its own and a sticky footer.
+// Pass onSubmit to render the body and footer as one form (Cancel + submit button);
+// otherwise pass `footer` for custom actions. Esc and a click on the backdrop close it,
+// Tab stays inside, and focus returns to the opener. Becomes a bottom sheet on phones.
+export function Modal({ title, subtitle, onClose, size = 'md', onSubmit, submitLabel = 'Save', submitTone = 'primary', busy = false, submitDisabled = false, cancelLabel = 'Cancel', error, footer, children }) {
+  const panel = useRef(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  const titleId = useId();
+
+  useEffect(() => {
+    const opener = document.activeElement;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+    const node = panel.current;
+    if (node && !node.contains(document.activeElement)) {
+      (node.querySelector('[data-autofocus], .modal-body input, .modal-body select, .modal-body textarea') || node.querySelector(FOCUSABLE))?.focus();
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') { e.stopPropagation(); closeRef.current(); return; }
+      if (e.key !== 'Tab' || !node) return;
+      const items = [...node.querySelectorAll(FOCUSABLE)].filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0]; const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = overflow; opener?.focus?.(); };
+  }, []);
+
+  const body = (
+    <>
+      <div className="modal-body">
+        {error && <Alert kind="error">{error}</Alert>}
+        {children}
+      </div>
+      {(onSubmit || footer) && (
+        <div className="modal-footer">
+          {onSubmit ? (
+            <>
+              <Button type="button" variant="secondary" onClick={onClose} disabled={busy}>{cancelLabel}</Button>
+              <Button type="submit" variant={submitTone} loading={busy} disabled={submitDisabled}>{submitLabel}</Button>
+            </>
+          ) : footer}
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal card-pad stack" role="dialog" aria-modal="true" aria-label={title}>
-        <div className="row-between"><h3>{title}</h3><button className="btn btn-ghost btn-small" onClick={onClose} aria-label="Close">✕</button></div>
-        {children}
+      <div ref={panel} className={`modal modal-${size}`} role="dialog" aria-modal="true" aria-labelledby={titleId}>
+        <div className="modal-header">
+          <div><h2 id={titleId} className="modal-title">{title}</h2>{subtitle && <p className="modal-subtitle">{subtitle}</p>}</div>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close"><X size={18} aria-hidden="true" /></button>
+        </div>
+        {onSubmit ? <form className="modal-form" onSubmit={onSubmit} noValidate={false}>{body}</form> : body}
       </div>
     </div>
   );
 }
 
-export function Stat({ label, value, hint }) {
+export function ModalSection({ title, hint, children }) {
   return (
-    <div className="card card-pad stat">
-      <span className="muted small">{label}</span>
+    <section className="modal-section">
+      {title && <div className="modal-section-head"><h3>{title}</h3>{hint && <p className="muted small">{hint}</p>}</div>}
+      {children}
+    </section>
+  );
+}
+
+export function Stat({ label, value, hint, icon: Icon, tone = 'brand' }) {
+  return (
+    <div className="card stat">
+      <div className="stat-top">
+        <span className="stat-label">{label}</span>
+        {Icon && <span className={`stat-icon tone-${tone}`}><Icon size={18} aria-hidden="true" /></span>}
+      </div>
       <strong className="stat-value">{value}</strong>
       {hint && <span className="muted small">{hint}</span>}
     </div>
