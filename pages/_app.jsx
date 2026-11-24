@@ -1,26 +1,21 @@
-import React from 'react';
 import Head from 'next/head';
-import Navbar from '../src/components/Navbar';
-import Footer from '../src/components/Footer';
-import { ThemeProvider } from '../src/context/ThemeContext';
-import { DemoSessionProvider } from '../src/context/DemoSessionContext';
-import '../src/index.css';
+import '../src/styles/variables.css';
+import '../src/styles/global.css';
+import '../src/styles/components.css';
+import '../src/styles/pages.css';
+import { AuthProvider } from '../src/context/AuthContext.jsx';
+import Layout from '../src/components/Layout.jsx';
 
-export default function Bookify({ Component, pageProps }) {
+export default function App({ Component, pageProps }) {
+  const bare = Component.bare;
+  const page = <Component {...pageProps} />;
   return (
-    <ThemeProvider>
-      <DemoSessionProvider>
-        <Head>
-          <title>Bookify — Intercity Bus Booking</title>
-          <meta name="description" content="Find intercity buses, choose your seat, and manage your Bookify ticket." />
-          <link rel="icon" href="/favicon.svg" />
-        </Head>
-        <div className="app-layout">
-          <Navbar />
-          <main className="app-main-content"><Component {...pageProps} /></main>
-          <Footer />
-        </div>
-      </DemoSessionProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <Head>
+        <title>Bookify · Intercity bus tickets</title>
+        <meta name="description" content="Search intercity buses in Bangladesh, choose your seat and get your ticket on your phone." />
+      </Head>
+      {bare ? page : <Layout>{page}</Layout>}
+    </AuthProvider>
   );
 }

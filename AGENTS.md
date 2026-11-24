@@ -33,11 +33,10 @@ All agents and contributors working in this codebase MUST strictly follow these 
   - NEVER write Tailwind CSS utility classes.
   - NEVER use inline CSS (`style={{ ... }}` or `style="..."`) anywhere in JSX or HTML.
 - **Design System Structure**:
-  - `src/styles/variables.css`: Design tokens, palette, liquid glass effects, typography scales.
+  - `src/styles/variables.css`: Design tokens (palette, radii, spacing, light and dark themes).
   - `src/styles/global.css`: Base resets, layout containers, global animations.
-  - `src/styles/liquid-glass.css`: Liquid glassmorphism blur and border treatments.
-  - `src/styles/components.css`: Discrete styling for UI components (cards, seat map, trackers).
-  - `src/styles/pages.css`: Dedicated page-level views and grids.
+  - `src/styles/components.css`: Shared UI components (buttons, forms, cards, tables, header, footer).
+  - `src/styles/pages.css`: Page-level views (search, seat map, checkout, tickets, dashboards).
 
 ---
 
@@ -90,3 +89,8 @@ Bookify is structured as a cloud-native, zero-cost production platform running o
 - Specialized Agent Skills: `.agent/skills/`
 - System Architecture Diagrams: `.agent/diagrams/`
 
+
+
+## 6. v2 rebuild
+
+The active plan is `.agent/sdd/BOOKIFY_V2_REBUILD_PLAN.md`. The app uses Postgres functions (`bk_*`) for seat holds and payments instead of Redis; the demo mode, three.js viewer and Express server were removed.

@@ -1,35 +1,44 @@
 # Bookify
 
-Bookify is a three-role bus e-ticketing demo built with Next.js, React, external CSS, Express, Supabase Postgres and Stripe Checkout in test mode. Trips and bookings are persisted in Postgres. The separate bus tracker simulates progress, delays and accidents for fictional trips in the browser.
+Intercity bus ticketing for Bangladesh: passengers search trips, pick seats on the real coach layout, pay online and keep an e-ticket. Operators publish trips and see manifests and sales. Administrators approve operators, define routes and fares, and process refunds.
 
-## Local setup
+Built with Next.js (pages router), React, plain external CSS, Supabase (Postgres + Auth) and SSLCommerz or Stripe for payment.
 
-1. Use Node.js 22.12 or later and run npm ci.
-2. Apply supabase/migrations/20261120072108_bookify_hosted_demo.sql to a dedicated Supabase demo project. It creates the isolated Bookify tables, transactional functions and image bucket. For an empty project, this migration is self-contained. Optionally run supabase/seed.sql to generate next-week departures.
-3. Copy .env.example to .env. Set SUPABASE_URL, the server-only SUPABASE_SERVICE_ROLE_KEY, a random DEMO_SESSION_SECRET of at least 32 characters, and Stripe test credentials. Keep BOOKIFY_DEMO=true and use the same localhost origin as BOOKIFY_URL. Do not put secrets in VITE_ variables.
-4. Run npm run dev. Next.js serves both the interface and /api on http://localhost:3000.
-5. Forward Stripe test events to /api/stripe/webhook with Stripe CLI, and use its signing secret for STRIPE_WEBHOOK_SECRET. Subscribe to checkout.session.completed, refund.created and refund.updated.
+## Setup
 
-## Walk through the demo
+1. Node.js 22.12 or later, then `npm install`.
+2. In the Supabase SQL editor run `supabase/migrations/20261124120000_bookify_v2_production.sql`. It is self-contained (it creates every table it needs) and safe to re-run. The older `20261016_init_bookify_schema.sql` and `20261120072108_bookify_hosted_demo.sql` migrations are not required.
+3. Copy `.env.example` to `.env.local` and fill in `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and the server-only `SUPABASE_SERVICE_ROLE_KEY`. Set `BOOKIFY_URL` to the site's public origin.
+4. Choose a payment gateway with `PAYMENT_GATEWAY=sslcommerz` (set `SSLCOMMERZ_STORE_ID`, `SSLCOMMERZ_STORE_PASSWORD`, and `SSLCOMMERZ_SANDBOX=false` only in production) or `PAYMENT_GATEWAY=stripe` (set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and forward `checkout.session.completed` to `/api/payments/stripe-webhook`). SSLCommerz also needs its IPN URL `/api/payments/sslcommerz/ipn` enabled in the merchant panel. With no gateway configured, checkout reports that payment is unavailable.
+5. In Supabase Auth settings, add your site URL to the redirect URLs (used for confirmation and reset e-mails).
+5b. Operator sign-up uses the service-role key to create pre-confirmed accounts, so Supabase's "Confirm e-mail" setting does not block it.
+6. Sign up on the site, then make yourself an administrator: `update public.users set role_id = 3 where email = 'you@example.com';`
+7. `npm run dev`.
 
-1. Choose Sign in, then Vendor. Select a demo vendor, register a coach, and submit a route and fare.
-2. Sign out, choose Admin, enter the approved duration, and approve the request.
-3. Sign out, choose the original vendor, and publish a future departure. Daily repeats are optional. Schedules use Dhaka time.
-4. Sign out, select Passenger, and open /search to choose a trip and seats. Use a fictional name and test email. Pay in Stripe test mode, then wait for the signed webhook to confirm the booking in My Bookings. Use Print / Save PDF for the e-ticket.
-5. Review the manifest and sales totals under the vendor and Admin dashboards. Within the passenger session you can cancel a future ticket, then observe its refund state. Demo passenger bookings are tied to the browser session.
+## Logging in as each role
 
-A seat hold expires after 10 minutes. Stripe Checkout can stay open longer. A verified late payment goes into the refund workflow when the seat hold is gone.
+- **Passenger:** `/sign-up`, then `/sign-in`.
+- **Operator (vendor):** `/operator/register` (company name, e-mail, password; no verification). Afterwards sign in at `/sign-in`; you land on `/operator`.
+- **Admin:** there is no public admin sign-up. Create a normal account at `/sign-up`, then in the Supabase SQL editor run `update public.users set role_id = 3 where email = 'you@example.com';`, sign out and back in. You land on `/admin`.
 
-## Vercel Hobby demo
+The header shows "Operator dashboard" or "Admin dashboard" after sign-in, and a light/dark toggle (follows the system until you choose).
 
-Import this repo with the Next.js preset. Set the entries from .env.example as server environment variables, with BOOKIFY_URL set to the deployed HTTPS origin. Configure the Stripe test webhook at that origin. Use matching preview/production demo settings and a dedicated Supabase project with synthetic data. The one-click Admin and Vendor identities are shared across demo visitors. Use this only for a non-commercial demonstration.
+## How the system works
 
-Stripe test mode is deliberate. Commercial hosting and an eligible Stripe merchant account, protected staff accounts, production access controls and operational readiness are separate requirements. See [Vercel Hobby](https://vercel.com/docs/plans/hobby) and [Stripe availability](https://stripe.com/global).
+Three roles: passenger, operator (vendor) and admin.
 
-## Verification
+- **Operators** register at `/operator/register` with only a company name, e-mail and password. There is no e-mail verification and no approval: the account works immediately (the server creates it as already confirmed). A signed-in passenger can instead upgrade at `/operator/apply`.
+- Operators **add buses** (each gets a unique code like `BUS-7K3QZ9`; the photo is a plain image URL, nothing is uploaded) and **request routes** at `/operator/routes`: any start point and destination, Non-AC, AC or Sleeper, their proposed fare, journey time, and boarding and dropping points.
+- **Admins** review requests at `/admin/approvals` and can change the fare and the duration before approving. Approval creates the route and its stops.
+- Operators **publish trips** (one-off or recurring) from an approved route. A bus is free again exactly when a trip's journey time is over; the database rejects trips that overlap for the same bus. Operators choose which buses are available or off duty.
+- The **fleet playground** (`/operator/playground`, admins see everyone's at `/admin/fleet`) shows every bus as available, on trip, in traffic, accident, breakdown or off duty. The state comes only from real data: trip timing (progress is elapsed time against the journey time) and the condition updates an operator or admin records. Nothing is simulated.
+- **Passengers** search, choose seats (held for 10 minutes), enter details, pay, and receive a ticket with PNR and QR code. Cancelling follows the refund tiers in `/policies/refunds`.
+- **Refunds** are queued in the database; an admin sends the money from the payment provider's dashboard and records the reference at `/admin/refunds`.
 
-Run npm test, npm run lint and npm run build. After the build, run npm run test:next to verify direct page routes, session cookies and raw Stripe signatures against the production server. Tests cover database approval, scheduling and inventory decisions using embedded Postgres, role and signature handling over local HTTP, and simulated tracking. A hosted smoke test additionally requires configured Supabase and Stripe test credentials.
+All reads and writes go through `/api` routes that verify the Supabase session and use the service-role key. Row Level Security is on for every table with no browser access. Seat holds, payment confirmation, cancellation and scheduling are single Postgres functions (`bk_*`), so they are atomic under concurrency.
 
-## Optional demo email
+## Quality gates
 
-Set RESEND_API_KEY, BOOKIFY_EMAIL_FROM (a sender permitted by Resend) and BOOKIFY_EMAIL_TEST_RECIPIENT in the server environment. Use the same test recipient address when booking. Resend sends a standalone e-ticket after Stripe confirms payment and a notice after Stripe confirms a refund. In both cases, provider idempotency keys reduce duplicate sends during webhook retries. My Bookings remains available with email disabled.
+`npm test` runs the migration, booking lifecycle (hold conflicts, expiry, payment idempotency, amount mismatch, refunds, trip cancellation, overlap) and layout tests against an embedded Postgres. `npm run lint` and `npm run build` must also pass.
+
+Design rules (see `AGENTS.md`): plain CSS under `src/styles/`, no Tailwind, no inline styles. The product plan and audit are in `.agent/sdd/BOOKIFY_V2_REBUILD_PLAN.md`.
