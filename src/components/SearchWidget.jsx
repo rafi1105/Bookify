@@ -2,10 +2,15 @@ import React, { useState, useId } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowRightLeft, Search } from 'lucide-react';
 import { CITY_OPTIONS } from './CitySelect';
+import GlassSearchWidget from './GlassSearchWidget';
 
 const dhakaDate = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Dhaka' }).format(new Date());
 
-export default function SearchWidget({
+export default function SearchWidget(props) {
+  return props.compact ? <SearchForm {...props} /> : <GlassSearchWidget {...props} />;
+}
+
+function SearchForm({
   compact = false, initialFrom = '', initialTo = '', initialDate = '', initialClass = 'all', initialTime = 'all',
 }) {
   const { push: navigate } = useRouter();
