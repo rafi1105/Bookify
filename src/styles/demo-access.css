@@ -420,3 +420,135 @@
     grid-column: 1 / -1;
   }
 }
+
+/* ---- Fixed glass navbar clearance for every inner page ---- */
+.page-container,
+.page-container.search-page {
+  padding-top: clamp(6.75rem, 9vw, 8rem);
+}
+
+/* ---- Workspace dashboard ---- */
+.site-workspace {
+  padding-bottom: clamp(2rem, 6vw, 4rem);
+  gap: 1.75rem;
+}
+.site-workspace h2 {
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+.workspace-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.85rem;
+  margin: 0;
+}
+.workspace-summary div {
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--bg-surface);
+}
+.workspace-summary dt {
+  color: var(--text-sub);
+  font-size: 0.82rem;
+}
+.workspace-summary dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.site-workspace .bookify-panel {
+  border-radius: 14px;
+  background: var(--bg-surface);
+  transition: border-color 0.2s ease;
+}
+.site-workspace .bookify-panel:hover {
+  border-color: var(--border-hover);
+}
+.site-workspace .bookify-panel h3 {
+  font-size: 1.05rem;
+}
+.site-workspace .bookify-panel p {
+  color: var(--text-sub);
+}
+.site-workspace .bookify-form label {
+  font-size: 0.88rem;
+  color: var(--text-sub);
+}
+.site-workspace .bookify-form input:focus-visible,
+.site-workspace .bookify-form select:focus-visible,
+.site-workspace .bookify-panel button:focus-visible {
+  outline: 2px solid var(--site-accent);
+  outline-offset: 2px;
+}
+.site-workspace .bookify-form > button:last-child,
+.site-workspace .bookify-actions button[value="approved"] {
+  background: var(--site-accent);
+  border-color: var(--site-accent);
+  color: var(--site-accent-ink);
+  font-weight: 650;
+}
+.site-workspace .bookify-actions button[value="rejected"] {
+  color: #c0392b;
+}
+.workspace-badge {
+  display: inline-block;
+  padding: 0.12rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  font-size: 0.76rem;
+  font-weight: 650;
+  text-transform: capitalize;
+}
+.workspace-badge[data-state="approved"] {
+  color: #16794c;
+  border-color: currentColor;
+  background: rgba(22, 121, 76, 0.1);
+}
+.workspace-badge[data-state="pending"] {
+  color: #9a6700;
+  border-color: currentColor;
+  background: rgba(154, 103, 0, 0.1);
+}
+.workspace-badge[data-state="rejected"] {
+  color: #c0392b;
+  border-color: currentColor;
+  background: rgba(192, 57, 43, 0.1);
+}
+.workspace-hint {
+  font-size: 0.85rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  background: var(--bg-input);
+}
+.workspace-notice {
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid #16794c;
+  color: #16794c;
+  background: rgba(22, 121, 76, 0.1);
+}
+.workspace-error {
+  border-color: #c0392b;
+}
+.site-workspace details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.site-workspace ul {
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.3rem;
+}
+:root.dark .workspace-badge[data-state="approved"],
+:root.dark .workspace-notice {
+  color: #5fd49b;
+}
+:root.dark .workspace-badge[data-state="pending"] {
+  color: #f0c05a;
+}
+:root.dark .workspace-badge[data-state="rejected"],
+:root.dark .site-workspace .bookify-actions button[value="rejected"] {
+  color: #ff8a7a;
+}

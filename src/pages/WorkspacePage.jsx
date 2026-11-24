@@ -3,6 +3,27 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, dhakaTime, money } from '../lib/bookifyApi';
 
+function Badge({ state, children }) {
+  return <span className="workspace-badge" data-state={state}>{children || state}</span>;
+}
+
+function Summary({ data, user }) {
+  const admin = user.role === 'admin';
+  const buses = data.buses.filter((bus) => admin || bus.vendor === user.vendor);
+  const pending = data.proposals.filter((proposal) => proposal.decision === 'pending').length;
+  const upcoming = data.trips.filter((trip) => !trip.cancelled && Date.parse(trip.departure) > Date.now()).length;
+  const net = data.orders.filter((order) => ['confirmed', 'refund_required'].includes(order.state)).reduce((total, order) => total + order.total, 0);
+  const stats = [
+    [admin ? 'Awaiting your decision' : 'Awaiting approval', pending],
+    ['Active buses', buses.filter((bus) => !bus.suspended).length + '/' + buses.length],
+    ['Upcoming trips', upcoming],
+    ['Booked revenue', money(net)],
+  ];
+  return <dl className="workspace-summary">
+    {stats.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
+  </dl>;
+}
+
 function Field({ label, name, type = 'text', ...props }) {
   return <label>{label}<input name={name} type={type} required {...props} /></label>;
 }
@@ -44,7 +65,8 @@ function VendorForms({ data, update, busy }) {
           <option key={proposal.id} value={proposal.id}>{proposal.origin} → {proposal.destination} · {proposal.duration} min · {money(proposal.fare)}</option>
         ))}
       </select></label>
-      <Field label="Departure (Dhaka time)" name="departure" type="datetime-local" />
+      {!proposals.some((proposal) => proposal.decision === 'approved') && <p className="workspace-hint">Propose a route and wait for admin approval before scheduling.</p>}
+      <Field label="Departure (Dhaka time)" name="departure" type="datetime-local" min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)} />
       <Field label="Repeat daily (number of departures)" name="occurrences" type="number" min="1" max="14" defaultValue="1" />
     </ActionForm>
   </div>;
@@ -58,7 +80,7 @@ function Proposals({ data, admin, busy, update }) {
       {data.proposals.map((proposal) => (
         <article className="bookify-panel bookify-stack" key={proposal.id}>
           <h3>{proposal.origin} → {proposal.destination}</h3>
-          <p>{proposal.vendor} · {money(proposal.fare)} · {proposal.decision}</p>
+          <p><Badge state={proposal.decision} /> {proposal.vendor} · {money(proposal.fare)}</p>
           <p>{proposal.boarding} → {proposal.dropping}</p>
           {proposal.duration && <p>Approved duration {proposal.duration} min</p>}
           {proposal.reason && <p>{proposal.reason}</p>}
@@ -95,11 +117,13 @@ function Fleet({ data, admin, busy, update }) {
           {bus.image && <img className="bookify-coach-image" src={bus.image} alt="" loading="lazy" />}
           <h3>{bus.name}</h3>
           <p>{bus.vendor} · {bus.registration} · {bus.coach} · {bus.seats.length} seats</p>
-          <p>{bus.suspended ? 'License suspended in Bookify' : 'Active license record'}</p>
+          <p>{bus.suspended ? <Badge state="rejected">License suspended</Badge> : <Badge state="approved">Active license</Badge>}</p>
           <p>{reviews.length ? (reviews.reduce((total, item) => total + item.rating, 0) / reviews.length).toFixed(1) + '/5 from ' + reviews.length + ' reviews' : 'No passenger reviews'}</p>
           {incidents.length ? <ul>{incidents.map((incident) => <li key={incident.id}>{dhakaTime(incident.created_at)} · {incident.note}</li>)}</ul> : <p>No incident records</p>}
           {admin && <>
-            <button disabled={busy} onClick={() => update('/workspace/buses/' + bus.id, { suspended: !bus.suspended })}>
+            <button disabled={busy} onClick={() => {
+              if (bus.suspended || window.confirm('Suspend this license? Its upcoming trips will need passenger review.')) update('/workspace/buses/' + bus.id, { suspended: !bus.suspended });
+            }}>
               {bus.suspended ? 'Reinstate license' : 'Suspend license'}
             </button>
             <form className="bookify-form" onSubmit={(event) => {
@@ -141,6 +165,7 @@ function Reports({ data, user, busy, update }) {
             {suspension && <p>Suspended · {suspension.reason}</p>}
             {user.role === 'admin' && <form className="bookify-form" onSubmit={(event) => {
               event.preventDefault();
+              if (!suspension && !window.confirm('Suspend ' + vendor + '? All of its buses stop selling.')) return;
               update('/workspace/vendors', { ...Object.fromEntries(new FormData(event.currentTarget)), vendor, suspended: !suspension });
             }}>
               {!suspension && <Field label="Suspension reason" name="reason" maxLength={300} />}
@@ -162,7 +187,7 @@ function Reports({ data, user, busy, update }) {
           <h3>{trip.origin} → {trip.destination}</h3>
           <p>{trip.vendor} · {trip.bus_name} · {money(trip.fare)}</p>
           <p>{dhakaTime(trip.departure)} → {dhakaTime(trip.arrival)}</p>
-          <p>{trip.cancelled ? 'Cancelled' : affected ? 'Suspended · review passengers' : 'Published'}</p>
+          <p>{trip.cancelled ? <Badge state="rejected">Cancelled</Badge> : affected ? <Badge state="pending">Suspended · review passengers</Badge> : <Badge state="approved">Published</Badge>}</p>
           {!!bookings.length && <details><summary>Manifest and refunds ({bookings.length})</summary>
             <ul>{bookings.map((order) => (
               <li key={order.id}>{order.passenger} · {order.seats.join(', ')} · {order.state} · {order.id}</li>
@@ -195,6 +220,12 @@ export default function WorkspacePage() {
       .catch((problem) => { if (active) setError(problem.message); });
     return () => { active = false; };
   }, [user]);
+
+  useEffect(() => {
+    if (!notice) return undefined;
+    const timer = setTimeout(() => setNotice(''), 4000);
+    return () => clearTimeout(timer);
+  }, [notice]);
 
   async function update(path, body, form) {
     setBusy(true);
@@ -237,11 +268,12 @@ export default function WorkspacePage() {
       <Link href="/my-bookings">My bookings</Link>
     </div>}
     {staff && !data && !error && <p role="status">Loading your dashboard…</p>}
-    {error && <div className="bookify-panel bookify-stack" role="alert">
+    {error && <div className="bookify-panel bookify-stack workspace-error" role="alert">
       <h2>{data ? 'Could not save changes' : 'Dashboard data unavailable'}</h2>
       <p>{error === 'Supabase is not configured' ? 'The demo database has not been connected to this deployment.' : error}</p>
     </div>}
-    {notice && <p role="status">{notice}</p>}
+    {notice && <p className="workspace-notice" role="status">{notice}</p>}
+    {staff && data && <Summary data={data} user={user} />}
     {staff && data && user?.role === 'vendor' && <VendorForms data={data} update={update} busy={busy} />}
     {staff && data && <>
       <Proposals data={data} admin={user.role === 'admin'} busy={busy} update={update} />
