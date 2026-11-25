@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { BarChart3, Ticket, Bus, CalendarClock, LayoutDashboard, Radio, Route as RouteIcon } from 'lucide-react';
+import { BarChart3, Ticket, Bus, CalendarClock, LayoutDashboard, Radio, Route as RouteIcon, MapPinned } from 'lucide-react';
 import Shell from './Shell.jsx';
 import { Alert } from './ui.jsx';
 import { ROLE_VENDOR } from '../lib/roles.js';
@@ -8,6 +8,7 @@ import { useApi } from '../lib/useApi.js';
 const LINKS = [
   { href: '/operator', label: 'Overview', exact: true, icon: LayoutDashboard },
   { href: '/operator/playground', label: 'Fleet playground', icon: Radio },
+  { href: '/operator/live-map', label: 'Live map', icon: MapPinned },
   { href: '/operator/buses', label: 'Buses', icon: Bus },
   { href: '/operator/routes', label: 'Routes and fares', icon: RouteIcon },
   { href: '/operator/trips', label: 'Trips', icon: CalendarClock },

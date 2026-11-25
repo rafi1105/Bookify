@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 // Embedded Postgres with the minimum of Supabase (auth schema, roles) stubbed, so the real
 // migration files can be executed unchanged. This is test infrastructure, not app data.
 // legacy: 'full' = old 23-table schema first, 'none' = empty database, 'partial' = old schema with some tables missing.
+export const LIVE_MAP = '20261125120000_bookify_live_map.sql';
+
 export async function freshDatabase(legacy = 'full') {
   const db = new PGlite();
   await db.exec(`
@@ -23,7 +25,7 @@ export async function freshDatabase(legacy = 'full') {
     create role anon; create role authenticated; create role service_role bypassrls;
     create publication supabase_realtime;
   `);
-  const files = legacy === 'none' ? ['20261124120000_bookify_v2_production.sql'] : ['20261016_init_bookify_schema.sql', '20261124120000_bookify_v2_production.sql'];
+  const files = legacy === 'none' ? ['20261124120000_bookify_v2_production.sql', LIVE_MAP] : ['20261016_init_bookify_schema.sql', '20261124120000_bookify_v2_production.sql', LIVE_MAP];
   for (const file of files) {
     // uuid-ossp and pgcrypto are not bundled with the embedded engine; gen_random_uuid() is built in.
     const sql = readFileSync(new URL('../supabase/migrations/' + file, import.meta.url), 'utf8')

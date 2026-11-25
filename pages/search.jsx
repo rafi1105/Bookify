@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { ArrowRight, Armchair, Bus, Star } from 'lucide-react';
 import SearchForm from '../src/components/SearchForm.jsx';
+import RouteMap from '../src/components/map/RouteMap.jsx';
 import { Badge, EmptyState, ErrorState, Skeleton } from '../src/components/ui.jsx';
 import { useApi } from '../src/lib/useApi.js';
 import { COACH_LABEL, addDays, dhakaHour, dhakaToday, formatBDT, formatDate, formatDuration, formatTime } from '../src/lib/format.js';
@@ -50,6 +51,7 @@ function TripCard({ trip }) {
             <h3>{trip.operator_name}</h3>
             <Badge tone="brand">{COACH_LABEL[trip.bus_type] || trip.bus_type}</Badge>
             {trip.seat_kind === 'BERTH' && <Badge tone="info">Berth</Badge>}
+            {trip.via && <Badge tone="info">Via {trip.destination}</Badge>}
           </div>
           <p className="muted small">{trip.bus_name} · {trip.bus_code}{trip.amenities?.length ? ` · ${trip.amenities.slice(0, 4).join(' · ')}` : ''}</p>
           <p className="small row"><Star size={14} aria-hidden="true" /> {trip.rating_count ? `${trip.rating} (${trip.rating_count} reviews)` : 'New on Bookify'}</p>
@@ -68,6 +70,7 @@ function TripCard({ trip }) {
             : <Link href={`/trips/${trip.trip_id}`} className="btn btn-primary">Select seats</Link>}
         </div>
       </div>
+      {trip.via && <p className="trip-points small via-note">This coach runs {trip.origin} → {trip.destination}. Board at {trip.board_at} and choose {trip.drop_at} as your dropping point. The fare shown is for the full route.</p>}
       <p className="trip-points muted small">Boarding: {trip.boarding_points?.join(', ') || '—'} · Dropping: {trip.dropping_points?.join(', ') || '—'}</p>
     </article>
   );
@@ -100,15 +103,19 @@ function Results({ from, to, date }) {
 
   if (loading) return <div className="stack">{[0, 1, 2].map((i) => <div key={i} className="card card-pad"><Skeleton lines={4} /></div>)}</div>;
   if (error) return <ErrorState error={error} onRetry={reload} />;
+  const viaCount = trips.filter((t) => t.via).length;
+  const map = <RouteMap from={from} to={to} viaCount={viaCount} />;
   if (!trips.length) {
     return (
-      <EmptyState icon={Bus} title={`No buses from ${from} to ${to} on this date`}>
+      <div className="stack">{map}<EmptyState icon={Bus} title={`No buses from ${from} to ${to} on this date`}>
         Try another date from the strip above, or search a different route.
-      </EmptyState>
+      </EmptyState></div>
     );
   }
 
   return (
+    <div className="stack">
+    {map}
     <div className="results-layout">
       <aside className="card card-pad filters stack" aria-label="Filters">
         <div className="row-between"><h3>Filters</h3>
@@ -139,6 +146,7 @@ function Results({ from, to, date }) {
           <EmptyState title="No buses match these filters">Clear a filter to see more buses.</EmptyState>
         )}
       </section>
+    </div>
     </div>
   );
 }

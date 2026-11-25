@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Ticket, Bus, CalendarClock, Radio, ClipboardCheck, LayoutDashboard, RotateCcw, Users } from 'lucide-react';
+import { Ticket, Bus, CalendarClock, Radio, ClipboardCheck, LayoutDashboard, RotateCcw, Users, MapPinned } from 'lucide-react';
 import Shell from './Shell.jsx';
 import { ROLE_ADMIN } from '../lib/roles.js';
 
@@ -8,6 +8,7 @@ const LINKS = [
   { href: '/admin/operators', label: 'Operators', icon: Users },
   { href: '/admin/approvals', label: 'Route approvals', icon: ClipboardCheck },
   { href: '/admin/fleet', label: 'Fleet playground', icon: Radio },
+  { href: '/admin/live-map', label: 'Live map', icon: MapPinned },
   { href: '/admin/buses', label: 'Buses', icon: Bus },
   { href: '/admin/trips', label: 'Trips', icon: CalendarClock },
   { href: '/admin/bookings', label: 'Bookings', icon: Ticket },

@@ -341,3 +341,92 @@
 .sim-control { flex-wrap: wrap; gap: var(--s-3); }
 .delay-notice { display: flex; gap: var(--s-2); align-items: flex-start; padding: var(--s-3) var(--s-4); border-radius: var(--radius); background: var(--accent-soft); border: 1px solid var(--accent); color: var(--ink); font-size: 14px; }
 .delay-notice svg { flex: none; margin-top: 2px; }
+
+/* Live map (admin and operator) */
+.live-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }
+.live-mode { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.live-mode-live .live-dot { animation: live-pulse 1.6s ease-in-out infinite; }
+.live-mode-connecting .live-dot, .live-mode-polling .live-dot { background: var(--accent); }
+.live-mode-error .live-dot { background: var(--danger); }
+@keyframes live-pulse { 50% { box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.2); } }
+.live-layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-4); align-items: start; }
+.live-map { position: relative; overflow: hidden; padding: 0; }
+.live-map-canvas { height: calc(100vh - 260px); min-height: 460px; width: 100%; background: var(--surface-3); }
+.live-map-loading { display: grid; place-items: center; padding: var(--s-6); }
+.live-side { max-height: calc(100vh - 200px); overflow-y: auto; }
+.live-h { display: flex; align-items: center; gap: var(--s-2); font-size: 15px; }
+.map-legend { position: absolute; left: var(--s-3); bottom: var(--s-3); z-index: 500; display: flex; flex-wrap: wrap; gap: var(--s-3); padding: 6px 10px; border-radius: var(--radius-s); background: var(--surface); box-shadow: var(--shadow-1); color: var(--ink-2); }
+.map-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.legend-line { display: inline-block; width: 22px; height: 5px; border-radius: 3px; }
+.legend-heavy { background: #dc2626; }
+.legend-moderate { background: #f59e0b; }
+.legend-straight { height: 0; border-top: 3px dashed var(--ink-3); border-radius: 0; }
+.map-placing { cursor: crosshair; }
+.map-placing .leaflet-interactive { cursor: crosshair; }
+.swatch { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--swatch, var(--ink-3)); box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--line-strong); }
+.legend-list, .live-bus-list, .live-incidents { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-2); }
+.legend-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: var(--s-2); }
+.color-input { width: 32px; height: 26px; padding: 0; border: 1px solid var(--line-strong); border-radius: var(--radius-s); background: var(--surface); cursor: pointer; }
+.live-bus { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; padding: var(--s-2) var(--s-3); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+.live-bus:hover { border-color: var(--line-strong); background: var(--surface-2); }
+.live-bus.is-selected { border-color: var(--brand); box-shadow: var(--focus); }
+.live-bus-meta { flex-wrap: wrap; gap: var(--s-3); }
+.live-progress { display: block; height: 4px; border-radius: 2px; background: var(--surface-3); overflow: hidden; }
+.live-progress > span { display: block; height: 100%; width: var(--pct, 0%); background: var(--brand); transition: width 1s linear; }
+.live-facts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2) var(--s-4); margin: 0; }
+.live-facts dt { font-size: 12px; color: var(--ink-3); }
+.live-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.driver-link { align-items: center; text-align: center; }
+.driver-link img { border-radius: var(--radius-s); background: #fff; padding: 6px; }
+.driver-link-url { word-break: break-all; }
+.map-popup { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+
+/* Bus and incident markers (Leaflet divIcons; colour and heading come from CSS variables) */
+.bus-pin-wrap, .incident-wrap, .route-end-wrap { background: none; border: 0; }
+.bus-pin { position: relative; width: 34px; height: 34px; --bus-color: #1d4ed8; --heading: 0deg; }
+.bus-pin-dot { position: absolute; inset: 5px; display: grid; place-items: center; border-radius: 50%; background: var(--bus-color); color: #fff; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.45); }
+.bus-pin-arrow { position: absolute; inset: 0; transform: rotate(var(--heading)); }
+.bus-pin-arrow::before { content: ""; position: absolute; left: 50%; top: -3px; margin-left: -5px; border: 5px solid transparent; border-bottom: 8px solid var(--bus-color); border-top: 0; }
+.bus-pin-label { position: absolute; left: 50%; top: 33px; transform: translateX(-50%); padding: 0 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.92); color: #0f172a; font-size: 10px; font-weight: 700; white-space: nowrap; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.25); }
+.bus-pin-gps .bus-pin-dot { box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.55), 0 1px 4px rgba(15, 23, 42, 0.45); }
+.bus-pin-halted .bus-pin-dot { background: #dc2626; animation: pin-alarm 1s ease-in-out infinite; }
+.bus-pin-late .bus-pin-label { background: #fee2e2; color: #b91c1c; }
+.bus-pin-selected .bus-pin-dot { inset: 2px; border-width: 3px; }
+@keyframes pin-alarm { 50% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.3); } }
+.incident-pin { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: #fff; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.45); background: #475569; }
+.incident-accident { background: #dc2626; }
+.incident-traffic_jam { background: #ea580c; }
+.incident-breakdown { background: #7c3aed; }
+.incident-road_block { background: #a16207; }
+.traffic-heavy { animation: jam-flow 1.4s linear infinite; stroke-dasharray: 14 6; }
+@keyframes jam-flow { to { stroke-dashoffset: -20; } }
+
+/* Search page route map */
+.route-map { overflow: hidden; padding: 0; }
+.route-map-head { padding: var(--s-3) var(--s-4); gap: var(--s-3); flex-wrap: wrap; }
+.route-map-canvas { height: 320px; width: 100%; background: var(--surface-3); }
+.route-map-foot { padding: var(--s-2) var(--s-4); }
+.route-end { width: 28px; height: 28px; display: grid; place-items: center; color: #fff; }
+.route-end svg { fill: currentColor; stroke: #fff; filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.5)); }
+.route-end-from { color: #0a7d55; }
+.route-end-to { color: #dc2626; }
+.route-end-label { font-weight: 700; }
+.via-note { color: var(--info); }
+
+/* Driver page */
+.drive-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); text-align: center; }
+.drive-stats > div { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 20px; }
+.drive-reports { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
+
+:root[data-theme="dark"] .leaflet-tile-pane { filter: brightness(0.75) contrast(1.1) saturate(0.8); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .leaflet-tile-pane { filter: brightness(0.75) contrast(1.1) saturate(0.8); } }
+
+@media (max-width: 1024px) {
+  .live-layout { grid-template-columns: 1fr; }
+  .live-side { max-height: none; overflow: visible; }
+  .live-map-canvas { height: 60vh; min-height: 360px; }
+}
+@media (max-width: 560px) {
+  .live-facts { grid-template-columns: 1fr; }
+  .route-map-canvas { height: 240px; }
+}

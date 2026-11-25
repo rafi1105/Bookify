@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import 'leaflet/dist/leaflet.css';
 import '../src/styles/variables.css';
 import '../src/styles/global.css';
 import '../src/styles/components.css';
